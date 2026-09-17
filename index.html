@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teleparty · Home revamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px; max-width: 1180px; margin: 0 auto; }
+  .ccard { background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: var(--r-xl); padding: 24px; text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; transition: .18s; }
+  .ccard:hover { border-color: var(--hairline-strong); transform: translateY(-3px); }
+  .ccard.final { border-color: rgba(226, 62, 107, .5);
+    background: linear-gradient(160deg, rgba(226, 62, 107, .09), var(--surface) 45%); }
+  .ccard .tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    font-weight: 700; color: var(--brand-pink); margin-bottom: 8px; }
+  .ccard h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .ccard > p { font-size: 13px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 20px; }
+  .ccard .open { font-size: 13px; font-weight: 600; color: var(--brand-pink); margin-top: auto; }
+
+  .decisions { max-width: 1180px; margin: 0 auto; background: var(--surface);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg); overflow: hidden; }
+  .drow { display: grid; grid-template-columns: 230px 1fr; gap: 24px;
+    padding: 16px 24px; border-bottom: 1px solid var(--hairline); }
+  .drow:last-child { border-bottom: none; }
+  .drow .k { font-size: 13px; font-weight: 600; }
+  .drow .v { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .rec { max-width: 1180px; margin: 0 auto; padding: 26px;
+    border-radius: var(--r-lg); border: 1px solid rgba(226,62,107,.4);
+    background: linear-gradient(120deg, rgba(226,62,107,.10), rgba(123,63,212,.06)); }
+  .rec h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+  .rec p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 860px; }
+  .rec b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Teleparty mobile</div>
+  <h1>Home revamp — final design</h1>
+  <p>Option D is the source of truth for Compose. Each page shows <b>every screen state</b> as snapshots, then a live phone you can tap and toggle.</p>
+</div>
+
+<div class="crumbs">
+  <a class="crumb active" href="index.html">Overview</a>
+  <a class="crumb" href="concept-d.html">Home</a>
+  <a class="crumb" href="party.html">Party</a>
+  <a class="crumb" href="profile-settings.html">Profile</a>
+  <a class="crumb" href="manage-accounts.html">Accounts</a>
+  <a class="crumb" href="components.html">Components</a>
+</div>
+
+<div class="concepts">
+  <a class="ccard final" href="concept-d.html">
+    <div class="tag">Interactive</div>
+    <h2>D · Final</h2>
+    <p>Home + Browse. Snapshots of every Home state, then a live phone — Switch Services, new-user connect card, premium gold theme, Start a party sheets.</p>
+    <div class="open">Open interactive prototype →</div>
+  </a>
+  <a class="ccard" href="party.html">
+    <div class="tag">Party</div>
+    <h2>Party tab</h2>
+    <p>Idle / live / guest / members / join-by-link plus the Party overlays — same ExoPlayer shell as production. Snapshots first, live phone below.</p>
+    <div class="open">Open Party →</div>
+  </a>
+  <a class="ccard" href="profile-settings.html">
+    <div class="tag">Profile · Settings</div>
+    <h2>Profile &amp; Settings</h2>
+    <p>Split for the five-tab nav: identity + subscription on Profile; preferences + Sign Out on Settings. Free/Premium themes.</p>
+    <div class="open">Open Profile &amp; Settings →</div>
+  </a>
+  <a class="ccard" href="manage-accounts.html">
+    <div class="tag">Accounts</div>
+    <h2>Manage accounts</h2>
+    <p>Constellation hero, + to add, chevron on connected rows. Sign out only in a confirm sheet — no repeated CTAs.</p>
+    <div class="open">Open Manage accounts →</div>
+  </a>
+</div>
+
+<div class="section-label">What I built to</div>
+<div class="decisions">
+  <div class="drow"><div class="k">Navigation</div>
+    <div class="v">Five slots: Settings · Home · FAB · Party · Profile. FAB opens the selected provider web view; glyph mirrors the active service (or Tp when none).</div></div>
+  <div class="drow"><div class="k">Service switch</div>
+    <div class="v">Pill → Switch Services sheet. No “Sign in” wallpaper — corner + / ✓ / green browsing dot.</div></div>
+  <div class="drow"><div class="k">New user</div>
+    <div class="v">YouTube open: trending only for YouTube. If every service needs login: dashed <b>Connect a service</b> card fills Home — no locked posters we can’t scrape. Pill / FAB still open the switcher; logos jump into that service’s sign-in.</div></div>
+  <div class="drow"><div class="k">Premium theme</div>
+    <div class="v">Backdrop + CTAs/FAB: purple magenta for free, gold for premium — same assets as Android <code>tp_gradient_bg</code> / <code>ic_premium_bg</code>.</div></div>
+  <div class="drow"><div class="k">Manage accounts</div>
+    <div class="v">Connected rows use a chevron. Sign out appears once in a confirm sheet after you open options.</div></div>
+  <div class="drow"><div class="k">Form factors</div>
+    <div class="v"><b>Phone</b> · bottom bar. <b>Foldable</b> · more columns, same 112dp posters. <b>iPad</b> · nav rail, two-column Home. <b>iPhone Duo</b> · Home left, Party/Browse right across the hinge. Never size a tile as a % of the display.</div></div>
+  <div class="drow"><div class="k">Title tap</div>
+    <div class="v">One sheet everywhere: Start a party / Watch alone, handing off by content ID.</div></div>
+</div>
+
+<div class="section-label">Build this</div>
+<div class="rec">
+  <h2>Start with Home</h2>
+  <p>Open <a href="concept-d.html" style="color:var(--brand-pink);font-weight:600">Home</a>. Compare the snapshot row, then scroll to the playground and tap through. Same layout on Party, Profile, and Accounts.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Components & tokens · Teleparty Home revamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .bench { max-width: 1180px; margin: 0 auto 44px; background: var(--surface);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg); padding: 24px; }
+  .bench h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .bench > p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; max-width: 760px; }
+  .specimens { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+  .spec { background: var(--bg); border: 1px solid var(--hairline); border-radius: var(--r-md);
+    padding: 16px; width: 320px; }
+  .spec .label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-tertiary); font-weight: 600; margin-bottom: 14px; }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .sw { border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--hairline); }
+  .sw .chip { height: 56px; }
+  .sw .cap { padding: 8px 10px; background: var(--bg); }
+  .sw .cap b { font-size: 12px; font-weight: 600; display: block; }
+  .sw .cap span { font-size: 10.5px; color: var(--text-tertiary); font-family: ui-monospace, monospace; }
+  /* Padding-top so the raised FAB isn't clipped by the specimen's rounded box. */
+  .navbench { width: 360px; border-radius: var(--r-md); overflow: hidden; padding-top: 24px;
+    border: 1px solid var(--hairline); background: var(--bg); }
+  .navbench .nav { position: relative; }
+  .typerow { display: flex; align-items: baseline; gap: 18px; padding: 10px 0;
+    border-bottom: 1px solid var(--hairline); }
+  .typerow .m { font-size: 11px; color: var(--text-tertiary); width: 190px; flex: none;
+    font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Foundations</div>
+  <h1>Components &amp; tokens</h1>
+  <p>The shared vocabulary all three concepts are built from. Colours follow the magenta-to-purple gradient in the v3 Figma sitting on the near-black surfaces already used by the Compose theme; Poppins is kept because it's the app-wide default via Calligraphy. Components are sized intrinsically so they work on phone, tablet, foldable, and iPhone Duo — never as a percentage of the window.</p>
+</div>
+
+<div class="crumbs">
+  <a class="crumb" href="index.html">Overview</a>
+  <a class="crumb" href="concept-d.html">Home</a>
+  <a class="crumb" href="party.html">Party</a>
+  <a class="crumb" href="profile-settings.html">Profile</a>
+  <a class="crumb" href="manage-accounts.html">Accounts</a>
+  <a class="crumb active" href="components.html">Components</a>
+</div>
+
+<div class="bench">
+  <h3>Colour</h3>
+  <p>One note worth resolving before build: the codebase currently carries three different primaries — <code>#6C63FF</code> in the Compose theme, <code>#E34248</code> in the XML theme, and this magenta gradient in Figma. These designs standardise on the Figma gradient.</p>
+  <div class="swatches" id="swatches"></div>
+</div>
+
+<div class="bench">
+  <h3>Type scale</h3>
+  <p>Poppins throughout, matching the existing <code>themes.xml</code> font path.</p>
+  <div id="type"></div>
+</div>
+
+<div class="bench">
+  <h3>Bottom navigation</h3>
+  <p>Five slots — Settings, Home, FAB, Party, Profile — with the centre FAB acting as a tab in its own right that opens the web view for the currently selected provider. Its glyph is the provider mark, so the control tells you which service you're browsing before you tap it.</p>
+  <div class="specimens" id="navs"></div>
+</div>
+
+<div class="bench">
+  <h3>Party card states</h3>
+  <p>One Home slot, four jobs: live (you’re in), waiting, left · rejoin (session without you), empty create. Invite/copy only when you’re in the party. The dock is Return/Rejoin on other tabs — not on Home.</p>
+  <div class="specimens" id="parties"></div>
+</div>
+
+<div class="bench">
+  <h3>Content tiles</h3>
+  <p>Tiles carry the provider's content ID so a tap can hand off straight to the Party tab and start playback, rather than routing through the provider's own browse UI.</p>
+  <div class="specimens" id="tiles"></div>
+</div>
+
+<div class="bench">
+  <h3>Connect / locked treatments</h3>
+  <p>Three escalating levels of prompt for a service the user hasn't signed into. Use the desaturated poster inside rails, the tile at the end of a rail, and the banner when a disconnected provider is explicitly selected.</p>
+  <div class="specimens" id="locked"></div>
+</div>
+
+<div class="bench">
+  <h3>Premium treatments</h3>
+  <p>Ordered by how much room they take. The full card is the v3 design; the strip and the row are the low-priority versions used in the concepts, since you flagged Premium as least priority.</p>
+  <div class="specimens" id="premium"></div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+const COLORS = [
+  ["Background", "--bg", "#0b0b0d"], ["Surface", "--surface", "#1a1a1d"],
+  ["Surface 2", "--surface-2", "#232327"], ["Brand magenta", "--brand-magenta", "#e23e6b"],
+  ["Brand purple", "--brand-purple", "#8b3fd4"], ["Premium", "--premium", "#f5d547"],
+  ["Live", "--live", "#ff4757"], ["Text secondary", "--text-secondary", "#a9a9b2"],
+];
+document.getElementById("swatches").innerHTML =
+  `<div class="sw"><div class="chip" style="background:var(--grad-brand)"></div>
+     <div class="cap"><b>Brand gradient</b><span>--grad-brand</span></div></div>`
+  + COLORS.map(([n, v, hex]) => `<div class="sw"><div class="chip" style="background:var(${v})"></div>
+      <div class="cap"><b>${n}</b><span>${hex}</span></div></div>`).join("");
+
+document.getElementById("type").innerHTML = [
+  ["Display / 30 Bold", "font-size:30px;font-weight:700;letter-spacing:-.02em", "Hero title"],
+  ["Title / 26 Semibold", "font-size:26px;font-weight:600", "Home"],
+  ["Heading / 17 Semibold", "font-size:17px;font-weight:600", "Switch to Premium"],
+  ["Body / 15 Regular", "font-size:15px", "Host unlimited watch parties"],
+  ["Label / 13 Semibold", "font-size:13px;font-weight:600", "Start a party"],
+  ["Caption / 11 Regular", "font-size:11px;color:var(--text-secondary)", "1:30 left · Netflix"],
+  ["Overline / 10 Bold", "font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase", "Current party"],
+].map(([m, s, t]) => `<div class="typerow"><span class="m">${m}</span><span style="${s}">${t}</span></div>`).join("");
+
+document.getElementById("navs").innerHTML =
+  ["crunchyroll", "netflix", "prime", "disney"].map((p) => `
+    <div class="spec" style="width:auto">
+      <div class="label">FAB · ${PROVIDERS[p].name}</div>
+      <div class="navbench">${nav(p === "netflix" ? "party" : "home", p, { partyBadge: p === "netflix" })}</div>
+    </div>`).join("");
+
+document.getElementById("parties").innerHTML = [
+  ["Live · playing", `
+    <div style="border-radius:var(--r-md);overflow:hidden;position:relative;height:120px">
+      <div style="position:absolute;inset:0;${art('Dracula Untold', 'netflix')}"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.8))"></div>
+      <span class="live-pill" style="position:absolute;top:8px;left:8px"><span class="live-dot"></span>Live</span>
+      <div style="position:absolute;left:10px;right:10px;bottom:8px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:5px">Dracula Untold</div>
+        <div class="progress"><i style="width:52%"></i></div></div>
+    </div>
+    <div class="row gap8" style="margin-top:10px">${avatars(5)}
+      <span class="tiny dim grow" style="margin-left:6px">5 watching</span>
+      <button class="btn primary sm">Invite</button></div>`],
+  ["Live · nothing playing", `
+    <div style="border-radius:var(--r-md);height:120px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(150deg,rgba(226,62,107,.35),rgba(123,63,212,.28))">
+      <span style="font-size:44px;font-weight:800;color:rgba(255,255,255,.16)">Tp</span></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn primary" style="flex:1">Invite</button>
+      <button class="btn ghost" style="flex:1">Browse</button></div>`],
+  ["No party", `
+    <div style="border-radius:var(--r-md);height:120px;display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.03);border:1px dashed var(--hairline-strong)">
+      <span style="font-size:44px;font-weight:800;color:rgba(255,255,255,.1)">Tp</span></div>
+    <button class="btn primary block" style="margin-top:10px">Create a party</button>`],
+  ["Left · rejoin", `
+    <div style="border-radius:var(--r-md);overflow:hidden;position:relative;height:120px">
+      <div style="position:absolute;inset:0;${art('London Has Fallen')}"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.82))"></div>
+      <span class="live-pill" style="position:absolute;top:8px;left:8px"><span class="live-dot"></span>Live</span>
+      <div style="position:absolute;left:10px;right:10px;bottom:8px">
+        <div style="font-size:13px;font-weight:600">London Has Fallen</div>
+        <div class="tiny dim">Netflix · you left</div></div>
+    </div>
+    <div class="row gap8" style="margin-top:10px">${avatars(4)}
+      <span class="tiny dim grow" style="margin-left:6px">4 still watching</span></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn ghost" style="flex:1">Not now</button>
+      <button class="btn primary" style="flex:1">Rejoin</button></div>`],
+  ["Invite link row", `
+    <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);
+      border:1px solid var(--hairline);border-radius:var(--r-pill);padding:6px 6px 6px 14px">
+      <code style="font-family:var(--font);font-size:12px;color:var(--text-secondary);flex:1">teleparty.com/j/8FK2QX</code>
+      <button class="btn ghost sm">Copy</button></div>
+    <p class="tiny dim" style="margin-top:12px;line-height:1.6">Always visible on a live party — one tap to copy, no share sheet in the way.</p>`],
+].map(([l, h]) => `<div class="spec"><div class="label">${l}</div>${h}</div>`).join("");
+
+document.getElementById("tiles").innerHTML = [
+  ["Poster · rail", `<div class="rail" style="padding:0">${TRENDING.netflix.slice(0,2).map(t => poster(t,'netflix','tall',{meta:false})).join("")}</div>`],
+  ["Poster · ranked", `<div class="rail ranked" style="padding:0">${TRENDING.prime.slice(0,2).map((t,i)=>`<div class="rank-item"><span class="rank">${i+1}</span>${poster(t,'prime','tall',{meta:false,badge:false})}</div>`).join("")}</div>`],
+  ["Continue watching", `
+    <div style="width:200px">
+      <div style="position:relative;height:112px;border-radius:var(--r-sm);overflow:hidden">
+        <div style="position:absolute;inset:0;${art('London Has Fallen','netflix')}"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.85))"></div>
+        <span style="position:absolute;top:8px;left:8px;z-index:3">${pmark('netflix')}</span>
+        <div class="play sm" style="position:absolute;right:8px;bottom:8px;z-index:3"></div>
+        <div style="position:absolute;left:8px;right:8px;bottom:8px"><div class="progress"><i style="width:62%"></i></div></div>
+      </div>
+      <div style="margin-top:7px"><div style="font-size:12px;font-weight:600">London Has Fallen</div>
+        <div style="font-size:10px;color:var(--text-tertiary);margin-top:1px">1:30 left</div></div>
+    </div>`],
+  ["Continue watching · row", `
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:76px;height:44px;border-radius:8px;position:relative;overflow:hidden;flex:none">
+        <div style="position:absolute;inset:0;${art('Solo Leveling','crunchyroll')}"></div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600">Solo Leveling</div>
+        <div style="font-size:10px;color:var(--text-tertiary);margin:3px 0 5px">E7 · 12m left</div>
+        <div class="progress"><i style="width:78%"></i></div></div>
+      <button class="btn ghost sm">Resume</button></div>`],
+].map(([l, h]) => `<div class="spec"><div class="label">${l}</div>${h}</div>`).join("");
+
+document.getElementById("locked").innerHTML = [
+  ["Desaturated poster", `<div class="rail" style="padding:0">${TRENDING.disney.slice(0,2).map(t => poster(t,'disney','tall',{meta:false})).join("")}</div>`],
+  ["End-of-rail tile", `<div class="rail" style="padding:0">${connectTile('max')}${connectTile('hotstar')}</div>`],
+  ["Banner", `
+    <div style="padding:12px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.04);
+      border:1px solid var(--hairline);display:flex;align-items:center;gap:10px">
+      ${pmark('disney','lg')}
+      <div style="flex:1"><b style="font-size:12.5px;display:block">Connect Disney+</b>
+        <span style="font-size:10.5px;color:var(--text-secondary)">Sign in once to watch and host parties</span></div>
+      <button class="btn primary sm">Connect</button></div>`],
+].map(([l, h]) => `<div class="spec"><div class="label">${l}</div>${h}</div>`).join("");
+
+document.getElementById("premium").innerHTML = [
+  ["Full card (v3)", `
+    <div class="premium-card" style="margin:0">
+      <h3>Switch to Premium</h3>
+      <p>Host unlimited watch parties on all of our supported channels &amp; customize your chat experience.</p>
+      <div class="price"><span class="amt">$3.99</span><span class="per">/month</span></div>
+      <div class="billed">billed $47.88 per year</div>
+      <button class="btn premium block">Try free for 7 days</button></div>`],
+  ["Strip", `
+    <div class="premium-strip" style="margin:0">
+      <span class="pmark lg" style="background:var(--premium);color:var(--text-on-premium)">★</span>
+      <div class="txt"><b>Switch to Premium</b><span>Unlimited parties · $3.99/mo</span></div>
+      <button class="btn premium sm">Try free</button></div>`],
+  ["Row", `
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--hairline)">
+      <span class="pmark lg" style="background:rgba(245,213,71,.16);color:var(--premium)">★</span>
+      <div style="flex:1;font-size:12px;color:var(--text-secondary)">
+        <b style="color:var(--premium);font-weight:600">Premium</b> · unlimited parties, $3.99/mo</div>
+      <button class="btn ghost sm">View</button></div>`],
+].map(([l, h]) => `<div class="spec"><div class="label">${l}</div>${h}</div>`).join("");
+</script>
+</body>
+</html>

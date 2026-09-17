@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home · Teleparty revamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Option D · Final</div>
+  <h1>Home + Browse</h1>
+  <p>Every Home state on this page. Snapshots first so you can compare them; the playground at the bottom is the live phone.</p>
+</div>
+
+<div class="crumbs">
+  <a class="crumb" href="index.html">Overview</a>
+  <a class="crumb active" href="concept-d.html">Home</a>
+  <a class="crumb" href="party.html">Party</a>
+  <a class="crumb" href="profile-settings.html">Profile</a>
+  <a class="crumb" href="manage-accounts.html">Accounts</a>
+  <a class="crumb" href="components.html">Components</a>
+</div>
+
+<div class="section-label">All states</div>
+<p class="section-lead">Click a phone to load it in the playground.</p>
+<div id="gallery"></div>
+
+<div class="section-label">Form factors</div>
+<p class="section-lead">Same Home on Phone, Foldable, iPad, and iPhone Duo. Tiles stay 112×168 — extra width adds columns or a second pane.</p>
+<div id="devices"></div>
+
+<div class="section-label">Interactive</div>
+<p class="section-lead">One live wireframe. Toggle a state or device, then tap pill, FAB, titles, and sheets inside the frame.</p>
+<div id="proto"></div>
+
+<div class="notes">
+  <h2>How Home holds together</h2>
+  <div class="note-grid">
+    <div class="note good">
+      <h4>Premium = gold theme, not pink on gold</h4>
+      <p>Toggle <b>Premium · gold bg</b> in the playground. Backdrop uses <code>ic_premium_bg</code>; CTAs / FAB shift gold. Free keeps magenta.</p>
+    </div>
+    <div class="note good">
+      <h4>White chrome marks</h4>
+      <p>Pill, FAB, and Browse chrome use white mono service marks. Full brand colour stays on content.</p>
+    </div>
+    <div class="note good">
+      <h4>New user: connect card, not locked trending</h4>
+      <p>We don’t scrape catalogs you aren’t signed into. Empty Home uses the dashed <b>Connect a service</b> card. Trending appears after a service is linked (YouTube counts when it’s open).</p>
+    </div>
+    <div class="note good">
+      <h4>Browse chrome is not a browser</h4>
+      <p>No URL field. Back + service identity + overflow. Switching is only via the Switch Services sheet.</p>
+    </div>
+    <div class="note good">
+      <h4>Browse with no accounts</h4>
+      <p>Matches production Hub Home: copy plus <b>Add My Accounts</b> — not a fake catalog. Home still uses the connect card.</p>
+    </div>
+    <div class="note good">
+      <h4>Paywall, not a toast</h4>
+      <p>Crunchyroll / Paramount as a free user opens the Premium sheet. Quota exhausted uses “No free parties left this week.”</p>
+    </div>
+    <div class="note good">
+      <h4>Tiles never stretch</h4>
+      <p>Phone, Foldable, iPad, and iPhone Duo keep 112×168 posters. Extra width adds columns or a second pane — never a percentage of the window.</p>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/proto.js"></script>
+<script>
+mountPage({
+  gallery: document.getElementById("gallery"),
+  devices: document.getElementById("devices"),
+  play: document.getElementById("proto"),
+  page: "home",
+});
+</script>
+</body>
+</html>

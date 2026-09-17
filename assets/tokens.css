@@ -1,0 +1,94 @@
+/* Teleparty Home revamp — design tokens
+   Palette derived from the v3 Figma (magenta → purple), sitting on the
+   near-black surfaces already used by the Compose theme (#0F0F0F / #1A1A1A). */
+
+:root {
+  /* Surfaces */
+  --bg: #0b0b0d;
+  --bg-elevated: #131316;
+  --surface: #1a1a1d;
+  --surface-2: #232327;
+  --surface-3: #2e2e34;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.16);
+
+  /* Brand */
+  --brand-magenta: #e23e6b;
+  --brand-pink: #e7457c;
+  --brand-purple: #8b3fd4;
+  --brand-violet: #6c63ff;
+  --grad-brand: linear-gradient(135deg, #e23e6b 0%, #b03bb8 55%, #7b3fd4 100%);
+  --grad-brand-soft: linear-gradient(160deg, rgba(226, 62, 107, 0.55) 0%, rgba(123, 63, 212, 0.35) 60%, rgba(11, 11, 13, 0) 100%);
+  --grad-cta: linear-gradient(90deg, #e2416f 0%, #b03bb8 100%);
+
+  /* Premium */
+  --premium: #f5d547;
+  --premium-dim: #c9a227;
+  --premium-deep: #b58e49;
+  --premium-wash: linear-gradient(135deg, rgba(245, 213, 71, 0.14) 0%, rgba(245, 213, 71, 0.02) 70%);
+  --grad-premium-cta: linear-gradient(90deg, #e0b84a 0%, #f5d547 45%, #c9a227 100%);
+  --shadow-fab-premium: 0 6px 20px rgba(201, 162, 39, 0.4), 0 2px 6px rgba(0, 0, 0, 0.5);
+
+  /* Text */
+  --text: #ffffff;
+  --text-secondary: #a9a9b2;
+  --text-tertiary: #6e6e77;
+  --text-on-premium: #1a1500;
+
+  /* Status */
+  --live: #ff4757;
+  --success: #5fc695;
+  --info: #6889ff;
+
+  /* Radii */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Spacing (8pt) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+
+  /* Adaptive windows — components size to these, never to % of the display.
+     Compact  < 600dp   phone portrait, foldable cover
+     Medium   600–839   large phone, fold outer
+     Expanded ≥ 840     tablet, fold inner
+     Dual               two logical panes (iPhone Duo, separating vertical hinge) */
+  --bp-medium: 600px;
+  --bp-expanded: 840px;
+  --tile-poster-w: 112px;
+  --tile-poster-h: 168px;
+  --tile-jump-w: 168px;
+  --tile-svc-w: 152px;
+  --nav-rail-w: 76px;
+  --hinge-w: 16px;
+  --sheet-dialog-w: 480px;
+  --party-card-max: 420px;
+
+  /* Elevation */
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-fab: 0 6px 20px rgba(226, 62, 107, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5);
+
+  /* Type */
+  --font: "Poppins", "Mona Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Provider brand colors */
+  --p-netflix: #e50914;
+  --p-prime: #00a8e1;
+  --p-disney: #1f80e0;
+  --p-max: #3b5bff;
+  --p-hulu: #1ce783;
+  --p-crunchyroll: #f47521;
+  --p-paramount: #0064ff;
+  --p-youtube: #ff0000;
+  --p-hotstar: #e8467c;
+  --p-zee5: #8230c6;
+}

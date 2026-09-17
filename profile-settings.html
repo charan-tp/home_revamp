@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile & Settings · Teleparty revamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Profile · Settings</div>
+  <h1>Split for the five-tab nav</h1>
+  <p>Today’s app merges these into one “Profile” screen. <b>Profile</b> is identity + accounts + subscription; <b>Settings</b> is preferences + support + sign out. Snapshots first, live phone below.</p>
+</div>
+
+<div class="crumbs">
+  <a class="crumb" href="index.html">Overview</a>
+  <a class="crumb" href="concept-d.html">Home</a>
+  <a class="crumb" href="party.html">Party</a>
+  <a class="crumb active" href="profile-settings.html">Profile</a>
+  <a class="crumb" href="manage-accounts.html">Accounts</a>
+  <a class="crumb" href="components.html">Components</a>
+</div>
+
+<div class="section-label">All states</div>
+<p class="section-lead">Click a phone to load it in the playground.</p>
+<div id="gallery"></div>
+
+<div class="section-label">Interactive</div>
+<p class="section-lead">One live wireframe. Switch Profile / Settings and Free / Premium, then tap inside.</p>
+<div id="proto"></div>
+
+<div class="notes">
+  <h2>What changed vs today’s screenshots</h2>
+  <div class="note-grid">
+    <div class="note good">
+      <h4>Profile ≠ Settings</h4>
+      <p>Matches Settings · Home · FAB · Party · Profile. Profile owns the person; Settings owns the knobs. Manage my accounts stays one tap from Profile.</p>
+    </div>
+    <div class="note good">
+      <h4>Tier accents only</h4>
+      <p>Free = purple bg + magenta edit ring. Premium = gold bg + gold badge / avatar ring / toggle on-state. Sign Out stays a danger gradient (not primary gold).</p>
+    </div>
+    <div class="note good">
+      <h4>Subscription placement</h4>
+      <p>Upgrade / Manage lives on Profile next to the badge — not buried under Support. Restore stays for non-active subs.</p>
+    </div>
+    <div class="note">
+      <h4>Still the same content</h4>
+      <p>Video compatibility, notifications, Contact Us, Discord, User ID copy, Additional info → What’s New, QA (debug), Sign Out → Get Started.</p>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/proto.js"></script>
+<script>
+mountPage({
+  gallery: document.getElementById("gallery"),
+  play: document.getElementById("proto"),
+  page: "profile",
+});
+</script>
+</body>
+</html>
