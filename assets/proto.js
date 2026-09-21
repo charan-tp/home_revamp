@@ -825,7 +825,7 @@ const PAGE_SCENES = {
     { id: "inbox", label: "Inbox", hint: "From the Home header — not a dock tab" },
     { id: "browse", label: "In-app browse", hint: "Same as Apps — the selected service" },
     { id: "browse-empty", label: "Apps · empty", hint: "No accounts — Add My Accounts" },
-    { id: "switcher", label: "Switch app", hint: "Sheet over Home" },
+    { id: "switcher", label: "Switch service", hint: "Netflix-style overlay over Home" },
     { id: "paywall", label: "Premium paywall", hint: "Crunchyroll as a free user" },
     { id: "paywall-quota", label: "Quota exhausted", hint: "No free parties left this week" },
     { id: "netflix-reauth", label: "Netflix re-auth", hint: "Session expired mid-browse" },
@@ -862,7 +862,7 @@ const PAGE_SCENES = {
 };
 
 const PAGE_LEGEND = {
-  home: "Home is across services. The header is the current provider — tap it to switch. Browse has logos above the dock. The Party tab is how you return to a live watch.",
+  home: "Home is across services. The header is the current provider — tap it to switch. Browse has logos above the dock. Party is the circle on the right — that’s how you return to a live watch.",
   party: "The movie stays clear. Friends sit in a Telegram-style row under the player — never on the picture.",
   profile: "Profile is the person; Settings is the knobs. What’s New and Sign out → Get Started live here.",
   accounts: "Manage accounts links and unlinks. Sign out lives once, in the confirm sheet.",
@@ -1535,6 +1535,12 @@ function mountInteractive(root, options = {}) {
       return;
     }
     if (action === "open-switcher") { state.sheet = "switcher"; render(); return; }
+    if (action === "open-accounts") {
+      state.sheet = null;
+      state.tab = "accounts";
+      render();
+      return;
+    }
     if (action === "open-paywall") {
       state.sheet = "paywall";
       state.paywallSource = "provider";

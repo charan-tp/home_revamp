@@ -172,6 +172,7 @@ const ICONS = {
 };
 ICONS.profile = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.2"/><path d="M5.4 19c1.15-3.15 3.4-4.75 6.6-4.75S18.45 15.85 19.6 19"/></svg>`;
 ICONS.invite = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.1 2.8-4.7 5.5-4.7s4.8 1.6 5.5 4.7"/><path d="M17 7.5v6M14 10.5h6"/></svg>`;
+ICONS.close = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>`;
 ICONS.settings = ICONS.you;
 
 const INBOX_ITEMS = [
@@ -393,97 +394,43 @@ function hasLoginAccount(conn = {}, opts = {}) {
   return PROVIDER_ORDER.some((p) => !isOpen(p, opts) && !!conn[p]);
 }
 
-/* Switch Services sheet — no repeated "Sign in" copy.
-   Connected = full tile. Available = muted with a corner +.
-   Active browse = green dot. Premium = gold border. */
-function switcherTile(pid, current, opts = {}) {
+/* Netflix-style service switcher: current service is the “profile,” others sit in a row. */
+function switcherFace(pid, extraClass = "") {
   const p = PROVIDERS[pid];
-  const premium = p.tier === "premium";
-  const active = pid === current && !opts.empty;
-  const left = premium && !opts.isPremium ? ((opts.quota && opts.quota[pid]) || 0) : null;
-  const locked = premium && !opts.isPremium && left === 0;
-  const isConnected = isLinked(pid, opts);
-  const available = !isConnected && !locked;
-  return `<button class="svc-tile ${premium ? "premium" : ""} ${active ? "active" : ""} ${isConnected ? "connected" : ""} ${available ? "available" : ""} ${locked ? "locked" : ""}" data-p="${pid}" data-action="pick-service" type="button">
-    ${active ? '<span class="svc-dot" title="Browsing now"></span>' : ""}
-    ${locked ? '<span class="svc-lock">★</span>' : ""}
-    ${left > 0 ? `<span class="svc-quota">${left} left</span>` : ""}
-    ${available ? '<span class="svc-add" aria-hidden="true">+</span>' : ""}
-    ${isConnected && !active ? '<span class="svc-check" aria-hidden="true">✓</span>' : ""}
-    <span class="svc-logo" style="color:${premium ? "var(--premium)" : "#fff"}">${p.mark}</span>
-    <span class="svc-name">${p.name}</span>
+  return `<button class="nf-face ${extraClass}" data-action="pick-service" data-p="${pid}" type="button">
+    ${pmark(pid, "face")}
+    <span class="nf-face-name">${p.name}</span>
   </button>`;
 }
 
 function switcherSheet(current, opts = {}) {
-  const isPremium = opts.isPremium !== false;
-  const empty = !!opts.empty;
-  const connected = (ids) => ids.filter((p) => isLinked(p, opts));
-  const available = (ids) => ids.filter((p) => !isLinked(p, opts));
-  /* Prefer: Your services → Add free → Premium. Falls back to Free/Premium if nothing connected. */
-  const yours = connected([...FREE_PROVIDERS, ...PREMIUM_PROVIDERS]);
-  const addFree = available(FREE_PROVIDERS);
-  const prem = PREMIUM_PROVIDERS;
+  const connected = PROVIDER_ORDER.filter((p) => isLinked(p, opts));
+  const available = PROVIDER_ORDER.filter((p) => !isLinked(p, opts));
+  const currentPid = connected.includes(current) ? current : (connected[0] || null);
+  const others = connected.filter((p) => p !== currentPid);
 
-  const tileOpts = { isPremium, empty, conn: opts.conn, youtubeLogin: !!opts.youtubeLogin, quota: opts.quota || {} };
-  const section = (title, cls, ids) => {
-    if (!ids.length) return "";
-    return `<div class="svc-sec">
-      <div class="svc-sec-h ${cls}">${title}</div>
-      <div class="svc-grid">${ids.map((p) => switcherTile(p, current, tileOpts)).join("")}</div>
-    </div>`;
-  };
+  const hero = currentPid
+    ? `<button class="nf-hero" data-action="pick-service" data-p="${currentPid}" type="button">
+        ${pmark(currentPid, "hero")}
+        <span class="nf-hero-name">${PROVIDERS[currentPid].name}</span>
+      </button>`
+    : `<button class="nf-hero" data-action="open-accounts" type="button">
+        <span class="pmark hero plus">+</span>
+        <span class="nf-hero-name">Connect</span>
+      </button>`;
 
-  let body;
-  if (yours.length === 0) {
-    /* Brand-new user — nothing connected yet */
-    body = `
-      <div class="svc-empty">
-        <div class="svc-empty-ico">+</div>
-        <b>Add a streaming service</b>
-        <span>You’ll sign in on that service — we never see your password.</span>
-      </div>
-      ${section("Free services", "free", FREE_PROVIDERS)}
-      ${section("Premium Services ★", "prem", prem)}
-      ${isPremium ? "" : `<div class="svc-upsell">
-        <div><b>Unlock with Premium</b><span>Host on Crunchyroll, Paramount+ and more</span></div>
-        <button class="btn premium sm" data-action="open-paywall" type="button">Try free</button>
-      </div>`}`;
-  } else {
-    body = `
-      ${section("Your services", "free", yours)}
-      ${section("Add a free service", "free", addFree)}
-      ${section("Premium Services ★", "prem", prem)}
-      ${isPremium ? "" : `<div class="svc-upsell">
-        <div><b>Unlock with Premium</b><span>Host on Crunchyroll, Paramount+ and more</span></div>
-        <button class="btn premium sm" data-action="open-paywall" type="button">Try free</button>
-      </div>`}`;
-  }
-
-  const quotaHint = !isPremium && opts.quota
-    ? (() => {
-      const bits = PREMIUM_PROVIDERS
-        .map((p) => ({ p, n: opts.quota[p] || 0 }))
-        .filter((x) => x.n > 0)
-        .map((x) => `${x.n} free ${PROVIDERS[x.p].name} part${x.n === 1 ? "y" : "ies"} left this week`);
-      return bits.length ? `<p class="svc-lead">${bits.join(" · ")}</p>` : `<p class="svc-lead">No free parties left this week 😢</p>`;
-    })()
-    : "";
-  const lead = !hasLoginAccount(opts.conn || {}, opts)
-    ? (opts.youtubeLogin
-      ? "Sign in to a service you watch."
-      : "YouTube works without signing in. Add Netflix, Prime, and more below.")
-    : "Tap an app to browse its titles. Changing app while a video is playing asks first.";
+  const faces = others.map((p) => switcherFace(p)).join("")
+    + available.map((p) => switcherFace(p, "add")).join("");
 
   return `<div class="scrim" data-action="close-sheet"></div>
-    <div class="sheet sheet-switch">
-      <div class="sheet-grab"></div>
-      <div class="sheet-t">${empty || yours.length === 0 ? "Connect a service" : "Switch app"}</div>
-      <p class="svc-lead">${lead}</p>
-      ${quotaHint}
-      ${body}
-      <p class="svc-footnote">Android supports ${FREE_PROVIDERS.length + PREMIUM_PROVIDERS.length} services today.
-        The browser extension has more — we're bringing them over.</p>
+    <div class="sheet sheet-profiles">
+      <div class="nf-head">
+        <span class="nf-title">${currentPid ? "Services" : "Connect a service"}</span>
+        <button class="nf-x" data-action="close-sheet" type="button" aria-label="Close">${ICONS.close}</button>
+      </div>
+      <div class="nf-card">${hero}</div>
+      ${faces ? `<div class="nf-row">${faces}</div>` : ""}
+      <button class="nf-manage" data-action="open-accounts" type="button">Manage accounts</button>
     </div>`;
 }
 
@@ -611,7 +558,7 @@ function premiumBlock() {
   </div>`;
 }
 
-/* Capsule dock: Profile · Home · Browse · Party.
+/* Capsule dock: Profile · Home · Browse in the pill, Party as the orb on the right.
    On Browse, linked services sit in a second frosted pill above the tabs. */
 function nav(activeTab, _unused, opts = {}) {
   const resolved = activeTab === "browse" ? "apps"
@@ -632,17 +579,22 @@ function nav(activeTab, _unused, opts = {}) {
         </button>`;
       }).join("")}</div>`
     : "";
+  const partyOn = resolved === "party";
   return `
     <div class="nav-cluster${opts.live ? " live" : ""}${services ? " with-apps" : ""}">
       ${services}
-      <nav class="nav">
-        <div class="nav-tabs">
-          ${item("profile", "Profile")}
-          ${item("home", "Home")}
-          ${item("apps", "Browse")}
-          ${item("party", "Party", opts.partyBadge)}
-        </div>
-      </nav>
+      <div class="nav-dock">
+        <nav class="nav">
+          <div class="nav-tabs">
+            ${item("profile", "Profile")}
+            ${item("home", "Home")}
+            ${item("apps", "Browse")}
+          </div>
+        </nav>
+        <button class="nav-orb ${partyOn ? "active" : ""} ${opts.partyBadge ? "live" : ""}" data-action="nav" data-tab="party" type="button" aria-label="Party">
+          <span class="ico-wrap">${ICONS.party}${opts.partyBadge ? '<span class="ndot"></span>' : ""}</span>
+        </button>
+      </div>
     </div>`;
 }
 
