@@ -5,8 +5,8 @@
 <title>Components & tokens · Teleparty Home revamp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/tokens.css">
-<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/tokens.css?v=nav15">
+<link rel="stylesheet" href="assets/app.css?v=nav15">
 <style>
   .bench { max-width: 1180px; margin: 0 auto 44px; background: var(--surface);
     border: 1px solid var(--hairline); border-radius: var(--r-lg); padding: 24px; }
@@ -23,10 +23,9 @@
   .sw .cap { padding: 8px 10px; background: var(--bg); }
   .sw .cap b { font-size: 12px; font-weight: 600; display: block; }
   .sw .cap span { font-size: 10.5px; color: var(--text-tertiary); font-family: ui-monospace, monospace; }
-  /* Padding-top so the raised FAB isn't clipped by the specimen's rounded box. */
-  .navbench { width: 360px; border-radius: var(--r-md); overflow: hidden; padding-top: 24px;
+  .navbench { width: 360px; border-radius: var(--r-md); overflow: hidden; padding: 10px;
     border: 1px solid var(--hairline); background: var(--bg); }
-  .navbench .nav { position: relative; }
+  .navbench .nav { position: relative; left: auto; right: auto; bottom: auto; width: 100%; }
   .typerow { display: flex; align-items: baseline; gap: 18px; padding: 10px 0;
     border-bottom: 1px solid var(--hairline); }
   .typerow .m { font-size: 11px; color: var(--text-tertiary); width: 190px; flex: none;
@@ -48,6 +47,7 @@
   <a class="crumb" href="profile-settings.html">Profile</a>
   <a class="crumb" href="manage-accounts.html">Accounts</a>
   <a class="crumb active" href="components.html">Components</a>
+  <a class="crumb explore" href="astryx.html">Astryx</a>
 </div>
 
 <div class="bench">
@@ -64,13 +64,13 @@
 
 <div class="bench">
   <h3>Bottom navigation</h3>
-  <p>Five slots — Settings, Home, FAB, Party, Profile — with the centre FAB acting as a tab in its own right that opens the web view for the currently selected provider. Its glyph is the provider mark, so the control tells you which service you're browsing before you tap it.</p>
+  <p>Frosted pill dock: Profile · Home · Browse · Party. Every tab shows its name. Inbox is the Home header icon.</p>
   <div class="specimens" id="navs"></div>
 </div>
 
 <div class="bench">
   <h3>Party card states</h3>
-  <p>One Home slot, four jobs: live (you’re in), waiting, left · rejoin (session without you), empty create. Invite/copy only when you’re in the party. The dock is Return/Rejoin on other tabs — not on Home.</p>
+  <p>One Home slot, four jobs: live (you’re in), waiting, left · rejoin (session without you), empty create. Invite/copy only when you’re in the party. Return to a live watch from the Party tab — not a floating card on Apps.</p>
   <div class="specimens" id="parties"></div>
 </div>
 
@@ -92,7 +92,7 @@
   <div class="specimens" id="premium"></div>
 </div>
 
-<script src="assets/app.js"></script>
+<script src="assets/app.js?v=nav15"></script>
 <script>
 const COLORS = [
   ["Background", "--bg", "#0b0b0d"], ["Surface", "--surface", "#1a1a1d"],
@@ -119,7 +119,7 @@ document.getElementById("type").innerHTML = [
 document.getElementById("navs").innerHTML =
   ["crunchyroll", "netflix", "prime", "disney"].map((p) => `
     <div class="spec" style="width:auto">
-      <div class="label">FAB · ${PROVIDERS[p].name}</div>
+      <div class="label">Dock · ${PROVIDERS[p].name} current</div>
       <div class="navbench">${nav(p === "netflix" ? "party" : "home", p, { partyBadge: p === "netflix" })}</div>
     </div>`).join("");
 
@@ -133,16 +133,16 @@ document.getElementById("parties").innerHTML = [
         <div style="font-size:13px;font-weight:600;margin-bottom:5px">Dracula Untold</div>
         <div class="progress"><i style="width:52%"></i></div></div>
     </div>
-    <div class="row gap8" style="margin-top:10px">${avatars(5)}
-      <span class="tiny dim grow" style="margin-left:6px">5 watching</span>
-      <button class="btn primary sm">Invite</button></div>`],
+    <div class="row" style="margin-top:10px;justify-content:space-between;align-items:center">
+      ${avatars(5)}
+      <button class="huddle-invite" type="button" aria-label="Invite">${ICONS.invite}</button></div>`],
   ["Live · nothing playing", `
     <div style="border-radius:var(--r-md);height:120px;display:flex;align-items:center;justify-content:center;
       background:linear-gradient(150deg,rgba(226,62,107,.35),rgba(123,63,212,.28))">
       <span style="font-size:44px;font-weight:800;color:rgba(255,255,255,.16)">Tp</span></div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn primary" style="flex:1">Invite</button>
-      <button class="btn ghost" style="flex:1">Browse</button></div>`],
+      <button class="btn ghost" style="flex:1">Open Apps</button></div>`],
   ["No party", `
     <div style="border-radius:var(--r-md);height:120px;display:flex;align-items:center;justify-content:center;
       background:rgba(255,255,255,.03);border:1px dashed var(--hairline-strong)">
@@ -162,20 +162,20 @@ document.getElementById("parties").innerHTML = [
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn ghost" style="flex:1">Not now</button>
       <button class="btn primary" style="flex:1">Rejoin</button></div>`],
-  ["Invite link row", `
+  ["Invite sheet", `
     <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);
       border:1px solid var(--hairline);border-radius:var(--r-pill);padding:6px 6px 6px 14px">
       <code style="font-family:var(--font);font-size:12px;color:var(--text-secondary);flex:1">teleparty.com/j/8FK2QX</code>
       <button class="btn ghost sm">Copy</button></div>
-    <p class="tiny dim" style="margin-top:12px;line-height:1.6">Always visible on a live party — one tap to copy, no share sheet in the way.</p>`],
+    <p class="tiny dim" style="margin-top:12px;line-height:1.6">Opens from the person+ icon beside the huddle — copy or share, same sheet as Party.</p>`],
 ].map(([l, h]) => `<div class="spec"><div class="label">${l}</div>${h}</div>`).join("");
 
 document.getElementById("tiles").innerHTML = [
-  ["Poster · rail", `<div class="rail" style="padding:0">${TRENDING.netflix.slice(0,2).map(t => poster(t,'netflix','tall',{meta:false})).join("")}</div>`],
-  ["Poster · ranked", `<div class="rail ranked" style="padding:0">${TRENDING.prime.slice(0,2).map((t,i)=>`<div class="rank-item"><span class="rank">${i+1}</span>${poster(t,'prime','tall',{meta:false,badge:false})}</div>`).join("")}</div>`],
+  ["Poster · rail", `<div class="rail" style="padding:0">${TRENDING.netflix.slice(0,2).map(t => poster(t,'netflix','wide',{meta:false})).join("")}</div>`],
+  ["Poster · ranked", `<div class="rail ranked" style="padding:0">${TRENDING.prime.slice(0,2).map((t,i)=>`<div class="rank-item"><span class="rank">${i+1}</span>${poster(t,'prime','wide',{meta:false,badge:false})}</div>`).join("")}</div>`],
   ["Continue watching", `
     <div style="width:200px">
-      <div style="position:relative;height:112px;border-radius:var(--r-sm);overflow:hidden">
+      <div style="position:relative;aspect-ratio:16/9;border-radius:var(--r-sm);overflow:hidden">
         <div style="position:absolute;inset:0;${art('London Has Fallen','netflix')}"></div>
         <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.85))"></div>
         <span style="position:absolute;top:8px;left:8px;z-index:3">${pmark('netflix')}</span>
@@ -196,7 +196,7 @@ document.getElementById("tiles").innerHTML = [
 ].map(([l, h]) => `<div class="spec"><div class="label">${l}</div>${h}</div>`).join("");
 
 document.getElementById("locked").innerHTML = [
-  ["Desaturated poster", `<div class="rail" style="padding:0">${TRENDING.disney.slice(0,2).map(t => poster(t,'disney','tall',{meta:false})).join("")}</div>`],
+  ["Desaturated poster", `<div class="rail" style="padding:0">${TRENDING.disney.slice(0,2).map(t => poster(t,'disney','wide',{meta:false})).join("")}</div>`],
   ["End-of-rail tile", `<div class="rail" style="padding:0">${connectTile('max')}${connectTile('hotstar')}</div>`],
   ["Banner", `
     <div style="padding:12px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.04);

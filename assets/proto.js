@@ -13,6 +13,10 @@ function linkOpts(state) {
   return { conn: state.conn, youtubeLogin: !!state.youtubeLogin };
 }
 
+function inLiveParty(state) {
+  return state.party === "playing" || state.party === "idle";
+}
+
 function findTitle(id) {
   for (const pid of PROVIDER_ORDER) {
     const hit = (TRENDING[pid] || []).find((t) => t.id === id);
@@ -29,36 +33,25 @@ function protoPartyCard(state) {
     const pid = state.partyProvider;
     return `
       <div class="sec" style="margin-top:22px"><div class="sec-head">
-        <span class="sec-title">Current party</span>
-        <span class="live-pill"><span class="live-dot"></span>Live</span></div></div>
+        <span class="sec-title">Current party</span></div></div>
       <div class="d-party">
         <button class="d-stage" data-action="nav" data-tab="party" type="button">
           <div class="art" style="${art(item.title)}"></div><div class="veil"></div>
-          <div class="top"><span class="tiny dim">48:12 / 1:32:00</span></div>
           <div class="play-ring" style="--pct:52"><div class="play"></div></div>
           <div class="bottom"><div class="ttl">${item.title}</div></div>
         </button>
-        <div class="row gap8" style="margin-top:12px">${avatars(5)}
-          <span class="tiny dim grow" style="margin-left:6px">5 watching</span>
-          <button class="btn ghost sm" data-action="open-invite" type="button">Invite</button></div>
-        <div class="d-invite"><code>teleparty.com/join/8FK2QX</code>
-          <button class="btn ghost sm" data-action="copy-invite" type="button">Copy</button></div>
+        ${huddleStrip(state, 8)}
       </div>`;
   }
   if (state.party === "idle") {
     return `
       <div class="sec" style="margin-top:22px"><div class="sec-head">
-        <span class="sec-title">Current party</span>
-        <span class="live-pill"><span class="live-dot"></span>Live</span></div></div>
+        <span class="sec-title">Current party</span></div></div>
       <div class="d-party">
         <div class="d-empty"><span class="tp">Tp</span></div>
-        <div class="row gap8" style="margin-top:12px">${avatars(3)}
-          <span class="tiny dim grow" style="margin-left:6px">3 waiting to watch</span></div>
+        ${huddleStrip(state, 3)}
         <div class="d-actions">
-          <button class="btn ghost" data-action="open-invite" type="button">Invite</button>
-          <button class="btn primary" data-action="fab" type="button">Browse a video</button></div>
-        <div class="d-invite"><code>teleparty.com/join/8FK2QX</code>
-          <button class="btn ghost sm" data-action="copy-invite" type="button">Copy</button></div>
+          <button class="btn primary" data-action="nav" data-tab="apps" type="button">Open Apps</button></div>
       </div>`;
   }
   if (state.party === "left") {
@@ -66,8 +59,7 @@ function protoPartyCard(state) {
     const people = item ? 4 : 3;
     return `
       <div class="sec" style="margin-top:22px"><div class="sec-head">
-        <span class="sec-title">Party still going</span>
-        <span class="live-pill"><span class="live-dot"></span>Live</span></div></div>
+        <span class="sec-title">Party still going</span></div></div>
       <div class="d-party">
         ${item ? `<button class="d-stage dimmed" data-action="rejoin-party" type="button">
           <div class="art" style="${art(item.title)}"></div><div class="veil"></div>
@@ -112,7 +104,7 @@ function protoJumpBackIn(state) {
   if (!linked.length) return "";
   return `
     <div class="sec">
-      <div class="sec-head"><span class="sec-title big">Jump back in</span><span class="sec-more">See all</span></div>
+      <div class="sec-head"><span class="sec-title big">Continue watching</span><span class="sec-more">See all</span></div>
       <div class="rail">${linked.map((c) => `
         <button class="d-chip" data-action="open-title" data-id="${c.id}" data-p="${c.provider}" type="button">
           <div class="th">
@@ -138,9 +130,9 @@ function protoGrid(state) {
       (TRENDING[p] || []).slice(0, per).map((t) => ({ t, p }))
     );
     return `<div class="d-grid">${mixed.slice(0, 9).map((m) => {
-      return `<button class="poster p-tall" data-action="open-title" data-id="${m.t.id}" data-p="${m.p}" type="button" style="border:0;padding:0;text-align:left;cursor:pointer">
+      return `<button class="poster p-wide" data-action="open-title" data-id="${m.t.id}" data-p="${m.p}" type="button" style="border:0;padding:0;text-align:left;cursor:pointer">
         <div class="art" style="${art(m.t.title)}"></div>
-        <div class="art-title" style="font-size:10px;bottom:30%">${m.t.title}</div>
+        <div class="art-title" style="font-size:10px;bottom:18%">${m.t.title}</div>
         <span class="badge">${pmark(m.p)}</span>
       </button>`;
     }).join("")}</div>`;
@@ -153,9 +145,9 @@ function protoGrid(state) {
   }
   const items = (TRENDING[sel] || []).concat(TRENDING[sel] || []).slice(0, 9);
   return `<div class="d-grid">${items.map((t) => `
-    <button class="poster p-tall" data-action="open-title" data-id="${t.id}" data-p="${sel}" type="button" style="border:0;padding:0;text-align:left;cursor:pointer">
+    <button class="poster p-wide" data-action="open-title" data-id="${t.id}" data-p="${sel}" type="button" style="border:0;padding:0;text-align:left;cursor:pointer">
       <div class="art" style="${art(t.title)}"></div>
-      <div class="art-title" style="font-size:10px;bottom:30%">${t.title}</div>
+      <div class="art-title" style="font-size:10px;bottom:18%">${t.title}</div>
     </button>`).join("")}</div>`;
 }
 
@@ -174,7 +166,7 @@ function protoHome(state) {
   const opts = linkOpts(state);
   const any = Object.values(state.conn).some(Boolean);
   const head = `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-    <div class="app-head"><h1>Home</h1>${servicePill(any ? (state.provider || "youtube") : null, opts)}</div>`;
+    ${appHead("Home", state, opts)}`;
 
   if (!any) {
     return head
@@ -245,29 +237,40 @@ function playerOverlayHtml(state) {
   return "";
 }
 
-function protoBrowse(state) {
-  const opts = linkOpts(state);
-  const hasLinked = PROVIDER_ORDER.some((p) => isLinked(p, opts));
-  if (!hasLinked) {
-    return `<div class="browse-empty">
-      <div class="browse-empty-card">
-        <p>Please sign in to your subscribed services to browse and watch with your friends.</p>
-        <button class="btn ghost block" data-action="nav" data-tab="accounts" type="button">Add My Accounts</button>
+function protoApps(state) {
+  const opts = Object.assign(linkOpts(state), { playing: state.party === "playing" });
+  const any = Object.values(state.conn).some(Boolean);
+  if (!any) {
+    return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
+      ${appHead("Apps", state, opts)}
+      <div class="browse-empty">
+        <div class="browse-empty-card">
+          <p>Connect a service to browse its titles here. Home is “what to watch”; Apps is the service you’re in.</p>
+          <button class="btn ghost block" data-action="nav" data-tab="accounts" type="button">Add My Accounts</button>
+        </div>
       </div>
-    </div>`;
+      <div class="spacer-nav"></div>`;
   }
-  const pid = state.provider || "netflix";
-  const linked = isLinked(pid, opts);
-  const body = linked ? webviewPage(pid) : webviewLogin(pid);
-  /* Make webview titles clickable */
-  const wired = body
-    .replace(/class="wv-tile"/g, 'class="wv-tile" data-action="open-title"')
-    .replace(/data-content-id="([^"]+)"/g, 'data-id="$1" data-p="' + pid + '"')
-    .replace(
-      /class="wv-btn block" style="background:([^"]+)"/g,
-      'class="wv-btn block" style="background:$1" data-action="complete-signin" data-p="' + pid + '"'
-    );
-  return `<div class="browse-view">${browseChrome(pid)}<div class="wv-wrap">${wired}</div></div>`;
+  const pid = state.provider || PROVIDER_ORDER.find((p) => isLinked(p, opts)) || "youtube";
+  const body = isLinked(pid, opts) ? webviewPage(pid) : webviewLogin(pid);
+  return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
+    <div class="apps-catalog">${wireCatalog(body, pid)}</div>`;
+}
+
+function protoInbox(state) {
+  const opts = linkOpts(state);
+  return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
+    ${appHead("Inbox", state, opts)}
+    <div class="mail-list">${INBOX_ITEMS.map((m) => `
+      <button class="mail ${m.unread && state.unread ? "unread" : ""}" data-action="read-inbox" type="button">
+        <span><div class="mail-t">${m.title}</div><div class="mail-b">${m.body}</div></span>
+        <span class="mail-when">${m.when}</span>
+      </button>`).join("")}</div>
+    <div class="spacer-nav"></div>`;
+}
+
+function protoBrowse(state) {
+  return protoApps(state);
 }
 
 function protoAccounts(state) {
@@ -396,7 +399,7 @@ function protoProfile(state) {
   const linked = Object.values(state.conn).filter(Boolean).length;
 
   return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-    <div class="ps-top"><h1>Profile</h1></div>
+    <div class="ps-top"><h1>You</h1></div>
     <div class="ps-hero">
       <div class="ps-avatar">
         <div class="face">👽</div>
@@ -475,8 +478,29 @@ function protoSettings(state) {
     <div class="spacer-nav"></div>`;
 }
 
+function partyPeopleBar(state, count) {
+  const shown = Math.min(count, 4);
+  const people = huddlePeople(state, shown);
+  const extra = Math.max(0, count - shown);
+  const camOn = state.youCam !== false;
+  const micOn = state.youMic !== false;
+  const tiles = people.map((m) => {
+    const ico = m.cam ? ICONS.cam : ICONS.micOff;
+    return `<button class="pty-person${m.cam && m.mic ? " talk" : ""}" type="button" data-action="open-members" aria-label="${m.n}">
+      <span class="av" style="background:${m.c}">${m.n[0]}<span class="av-pip ${m.cam ? "on" : "off"}">${ico}</span></span>
+      <span class="nm">${m.n}</span>
+    </button>`;
+  }).join("");
+  return `<div class="pty-people">
+    <div class="pty-people-row">${tiles}${extra > 0 ? `<button class="pty-person more" type="button" data-action="open-members"><span class="av more">+${extra}</span><span class="nm">More</span></button>` : ""}</div>
+    <div class="pty-call">
+      <button class="pty-ico ${camOn ? "on" : "off"}" data-action="toggle-cam" type="button" aria-label="Camera">${camOn ? ICONS.cam : ICONS.camOff}</button>
+      <button class="pty-ico ${micOn ? "on" : "off"}" data-action="toggle-mic" type="button" aria-label="Mic">${micOn ? ICONS.mic : ICONS.micOff}</button>
+    </div>
+  </div>`;
+}
+
 function protoParty(state) {
-  /* HubPartyFragment shell: ExoPlayer (16:9) → chat → composer */
   const members = partyMembers(state);
   const people = members.length;
   const isGuest = state.role === "guest";
@@ -486,183 +510,111 @@ function protoParty(state) {
   const canHost = Object.values(state.conn).some(Boolean);
   const opts = linkOpts(state);
   const ytReady = isOpen("youtube", opts) && !hasLoginAccount(state.conn, opts);
-  const browseLabel = ytReady ? "Browse YouTube" : "Browse videos";
-  const joinBtn = `<button class="btn ghost sm" data-action="open-join" type="button" style="margin-top:8px">Join with a link</button>`;
-
+  const browseLabel = ytReady ? "Browse YouTube" : "Browse Apps";
   const ov = state.playerOverlay;
-  let player;
+  const hostName = isGuest ? "Priya" : "You";
+  const mode = playing ? "room" : hasParty ? "lobby" : "empty";
+
+  const feed = playing ? `
+      <div class="pty-line evt"><b>${hostName}</b> started ${state.partyItem.title}</div>
+      <div class="pty-line"><b style="color:#c9a0ff">Priya</b> I'm in — don't spoil anything</div>
+      <div class="pty-line"><b style="color:#7ad7ff">Kabir</b> Volume check?</div>
+      <div class="pty-line"><b style="color:#8ee0a2">Meera</b> this opening is insane</div>` : hasParty ? `
+      <div class="pty-line evt"><b>${hostName}</b> created the party</div>
+      <div class="pty-line"><b style="color:#ff8fb0">Aarav</b> waiting — pick something good</div>
+      <div class="pty-line evt"><b>Priya</b> joined</div>` : left ? `
+      <div class="pty-line evt">You left. Rejoin to chat again.</div>` : `
+      <div class="pty-line evt">${ytReady ? "Open Apps and pick a video." : canHost ? "Create a party, then pick something to watch." : "Join with an invite link to watch with friends."}</div>`;
+
+  const peopleBar = hasParty ? partyPeopleBar(state, Math.max(people, 3)) : "";
+  const composer = (hasParty || left) ? `
+    <div class="pty-composer">
+      <button class="pty-ico" data-action="toast" data-msg="GIF" type="button">GIF</button>
+      <div class="field">${hasParty ? "Say something" : "Chat is paused"}</div>
+      <button class="pty-ico send" data-action="${hasParty ? "toast" : "rejoin-party"}" data-msg="Sent" type="button" aria-label="${hasParty ? "Send" : "Rejoin"}">${hasParty ? ICONS.send : "↩"}</button>
+    </div>` : "";
+
+  const player = (inner) => `<div class="pty-player">${inner}</div>`;
+  const chat = `<div class="pty-chat">${feed}</div>`;
+
+  let body;
   if (playing) {
     const item = state.partyItem;
-    const pid = state.partyProvider;
-    const chrome = ov ? "" : `
-        <div class="top">
-          ${pmark(pid)}
-          <span class="live-pill"><span class="live-dot"></span>Live</span>
-        </div>
-        <div class="play-ring" style="--pct:52"><div class="play"></div></div>
-        <div class="bottom">
-          <div class="ttl">${item.title}</div>
-          <div class="meta-row">
-            <span>${PROVIDERS[pid].name} · ${isGuest ? "guest" : "synced"}</span>
-            <span>48:12 / 1:32:00</span>
+    body = `
+      ${player(`
+        ${ov === "noauth" ? "" : `<div class="art" style="${art(item.title)}"></div>`}
+        <div class="veil"></div>
+        ${ov ? playerOverlayHtml(state) : `
+          <div class="pty-top">
+            <span class="live-pill"><span class="live-dot"></span>Live</span>
+            <div class="ttl">${item.title}</div>
+            <button class="pty-who" data-action="open-members" type="button">${people}</button>
           </div>
-          <div class="progress" style="margin-top:6px"><i style="width:52%"></i></div>
-        </div>`;
-    player = `
-      <div class="pty-player">
-        ${ov === "noauth" ? "" : `<div class="art" style="${art(item.title)}"></div><div class="veil"></div>`}
-        ${chrome}
-        ${playerOverlayHtml(state)}
-      </div>`;
-  } else if (hasParty && isGuest) {
-    player = `
-      <div class="pty-player">
-        <div class="pty-player-cta">
-          <h2>Waiting for the host</h2>
-          <p>Only the host can pick the next video.</p>
-        </div>
-      </div>`;
+          <div class="pty-scrub"><i style="width:52%"></i></div>
+        `}
+      `)}
+      ${ov ? "" : peopleBar}
+      ${ov ? "" : chat}
+      ${ov && playing ? "" : composer}`;
   } else if (hasParty) {
-    player = `
-      <div class="pty-player">
-        <div class="pty-player-cta">
-          <h2>Pick a video</h2>
-          <p>Everyone’s waiting — choose something to watch.</p>
-          <button class="btn primary" data-action="fab" type="button">${browseLabel}</button>
+    body = `
+      ${player(`
+        <div class="pty-wash"></div>
+        <div class="pty-top">
+          <span class="live-pill wait"><span class="live-dot"></span>${isGuest ? "Waiting" : "Lobby"}</span>
+          <div class="ttl">${isGuest ? "Host is picking" : "Nothing playing yet"}</div>
+          <button class="pty-who" data-action="open-members" type="button">${people}</button>
         </div>
-      </div>`;
+        ${isGuest ? "" : `<button class="pty-cta" data-action="nav" data-tab="apps" type="button">${browseLabel}</button>`}
+      `)}
+      ${peopleBar}
+      ${chat}
+      ${composer}`;
   } else if (left) {
     const item = state.partyItem;
-    player = `
-      <div class="pty-player">
-        ${item ? `<div class="art" style="${art(item.title)}"></div><div class="veil"></div>` : ""}
-        <div class="pty-player-cta">
-          <h2>${item ? "You left this party" : "You left"}</h2>
-          <p>${item ? `Friends are still on ${item.title}.` : "Friends are still in the party."}</p>
-          <button class="btn primary" data-action="rejoin-party" type="button">Rejoin</button>
-          <button class="btn ghost sm" data-action="dismiss-left" type="button" style="margin-top:8px">Not now</button>
-        </div>
-      </div>`;
-  } else if (ytReady) {
-    player = `
-      <div class="pty-player">
-        <div class="pty-player-cta create">
-          <h2>Ready to watch</h2>
-          <p>YouTube is ready — pick a video and start a party.</p>
-          <button class="btn primary" data-action="fab" type="button">Browse YouTube</button>
-          ${joinBtn}
-        </div>
-      </div>`;
+    body = `
+      ${player(`
+        ${item ? `<div class="art" style="${art(item.title)}"></div>` : `<div class="pty-wash"></div>`}
+        <div class="veil"></div>
+      `)}
+      <div class="pty-empty">
+        <h2>${item ? "You left this party" : "You left"}</h2>
+        <p>${item ? `Friends are still on ${item.title}.` : "Friends are still in the party."}</p>
+        <button class="btn primary" data-action="rejoin-party" type="button">Rejoin</button>
+        <button class="btn ghost sm" data-action="dismiss-left" type="button">Not now</button>
+      </div>
+      ${composer}`;
   } else {
-    player = canHost ? `
-      <div class="pty-player">
-        <div class="pty-player-cta create">
-          <h2>Nothing playing</h2>
-          <p>Invite friends, then pick a video to watch together.</p>
-          <button class="btn primary" data-action="create-party" type="button">Create a party</button>
-          ${joinBtn}
-        </div>
-      </div>` : `
-      <div class="pty-player">
-        <div class="pty-player-cta create">
-          <h2>Join friends</h2>
-          <p>Paste an invite link to watch with them.</p>
-          <button class="btn primary" data-action="open-join" type="button">Join with a link</button>
-        </div>
+    const title = ytReady ? "Ready to watch" : canHost ? "Start a party" : "Join friends";
+    const copy = ytReady
+      ? "YouTube is ready — pick a video and the party starts with you."
+      : canHost
+        ? "Invite friends, then pick a video to watch together."
+        : "Paste an invite link to watch with them.";
+    const cta = ytReady
+      ? `<button class="btn primary" data-action="nav" data-tab="apps" type="button">Browse Apps</button>`
+      : canHost
+        ? `<button class="btn primary" data-action="create-party" type="button">Create a party</button>`
+        : `<button class="btn primary" data-action="open-join" type="button">Join with a link</button>`;
+    body = `
+      ${player(`<div class="pty-wash"></div>`)}
+      <div class="pty-empty">
+        <h2>${title}</h2>
+        <p>${copy}</p>
+        ${cta}
+        ${canHost || ytReady ? `<button class="btn ghost sm" data-action="open-join" type="button">Join with a link</button>` : ""}
       </div>`;
   }
 
-  const bar = hasParty ? `
-    <div class="pty-bar">
-      <button class="avatars-btn" data-action="open-members" type="button">${avatars(Math.min(people, 4))}</button>
-      <button class="who" data-action="open-members" type="button"><b>${people}</b> ${playing ? "watching" : "waiting"}</button>
-      <button class="btn ghost sm" data-action="open-invite" type="button">Invite</button>
-      <button class="btn ghost sm" data-action="leave-party" type="button">Leave</button>
-    </div>` : left ? `
-    <div class="pty-bar">
-      ${avatars(4)}
-      <div class="who">Still going without you</div>
-    </div>` : ytReady ? `
-    <div class="pty-bar">
-      <div class="who">Pick a YouTube video to start</div>
-    </div>` : canHost ? `
-    <div class="pty-bar">
-      <div class="who">Start a party or join with a link</div>
-    </div>` : `
-    <div class="pty-bar">
-      <div class="who">Join with an invite link</div>
-    </div>`;
-
-  const hostName = isGuest ? "Priya" : "uvuvuv";
-  const feed = playing ? `
-    <div class="pty-evt">
-      <div class="av">${isGuest ? "P" : "👽"}</div>
-      <div><div class="who">${hostName}</div><div class="what">started ${state.partyItem.title}</div></div>
-    </div>
-    <div class="pty-msg">
-      <div class="av" style="background:#7b3fd4">P</div>
-      <div class="bubble"><div class="who">Priya</div>I'm in — don't spoil anything</div>
-    </div>
-    <div class="pty-msg">
-      <div class="av" style="background:#00a8e1">K</div>
-      <div class="bubble"><div class="who">Kabir</div>Volume check?</div>
-    </div>` : hasParty ? `
-    <div class="pty-evt">
-      <div class="av">${isGuest ? "P" : "👽"}</div>
-      <div><div class="who">${hostName}</div><div class="what">created the party 🎉</div></div>
-    </div>
-    <div class="pty-evt">
-      <div class="av" style="background:#e2416f">A</div>
-      <div><div class="who">Aarav</div><div class="what">joined the party</div></div>
-    </div>` : left ? `
-    <div class="pty-evt">
-      <div class="av">👽</div>
-      <div><div class="who">Teleparty</div><div class="what">You left. Rejoin to chat again.</div></div>
-    </div>` : ytReady ? `
-    <div class="pty-evt">
-      <div class="av">👽</div>
-      <div><div class="who">Teleparty</div><div class="what">Browse YouTube to pick something</div></div>
-    </div>` : canHost ? `
-    <div class="pty-evt">
-      <div class="av">👽</div>
-      <div><div class="who">Teleparty</div><div class="what">Create a party to chat and watch together</div></div>
-    </div>` : `
-    <div class="pty-evt">
-      <div class="av">👽</div>
-      <div><div class="who">Teleparty</div><div class="what">Join a party to watch with friends</div></div>
-    </div>`;
-
-  const infoBtn = people < 2
-    ? `<button class="invite" data-action="open-invite" type="button" title="Invite">👤+</button>`
-    : `<button class="invite members" data-action="open-members" type="button" title="Members">${people}</button>`;
-
-  const composer = hasParty ? `
-        <div class="pty-composer">
-          ${infoBtn}
-          <div class="field">Aa</div>
-          <div class="tools">
-            <button class="tool" data-action="video-chat" type="button">◉</button>
-            <button class="tool" data-action="video-chat" type="button">🎙</button>
-            <button class="tool" data-action="toast" data-msg="GIF" type="button">GIF</button>
-            <button class="tool" data-action="toast" data-msg="Reactions" type="button">🎉</button>
-          </div>
-        </div>` : "";
-
-  return `<div class="pty">
-      ${player}
-      ${bar}
-      <div class="pty-chat">
-        <div class="pty-feed">${feed}</div>
-        ${composer}
-      </div>
-    </div>`;
+  return `<div class="pty ${mode}">${body}</div>`;
 }
 
 function protoScreen(state) {
   if (state.tab === "auth") return protoAuth();
-  if (state.tab === "browse") return protoBrowse(state);
+  if (state.tab === "apps" || state.tab === "browse") return protoApps(state);
+  if (state.tab === "inbox") return protoInbox(state);
   if (state.tab === "accounts") return protoAccounts(state);
-  if (state.tab === "profile") return protoProfile(state);
+  if (state.tab === "profile" || state.tab === "you") return protoProfile(state);
   if (state.tab === "settings") return protoSettings(state);
   if (state.tab === "party") return protoParty(state);
   return protoHome(state);
@@ -846,16 +798,6 @@ function protoOverlay(state) {
         </div>
       </div>`;
   }
-  if (state.party === "idle" && state.tab === "browse") {
-    return dock("picking", { people: 5 });
-  }
-  if ((state.party === "playing" || state.party === "idle") && state.tab !== "party" && state.tab !== "home") {
-    const title = state.partyItem?.title || "Party";
-    return dock("return", { title, people: state.party === "playing" ? 5 : 3 });
-  }
-  if (state.party === "left" && state.partyItem && state.tab !== "party" && state.tab !== "home") {
-    return dock("rejoin", { title: state.partyItem.title, people: 4 });
-  }
   return "";
 }
 
@@ -879,16 +821,18 @@ const PAGE_SCENES = {
     { id: "home-none", label: "No party yet", hint: "Create a party + trending" },
     { id: "empty", label: "New user", hint: "YouTube ready — no watch history" },
     { id: "empty-connect", label: "New user · connect", hint: "Connect card only — nothing to resume" },
-    { id: "browse", label: "Browse", hint: "Provider page in the WebView" },
-    { id: "browse-empty", label: "Browse · empty", hint: "No accounts — Add My Accounts" },
-    { id: "switcher", label: "Switch services", hint: "Sheet over Home" },
+    { id: "apps", label: "Browse", hint: "Service WebView — switch from logos above the dock" },
+    { id: "inbox", label: "Inbox", hint: "From the Home header — not a dock tab" },
+    { id: "browse", label: "In-app browse", hint: "Same as Apps — the selected service" },
+    { id: "browse-empty", label: "Apps · empty", hint: "No accounts — Add My Accounts" },
+    { id: "switcher", label: "Switch app", hint: "Sheet over Home" },
     { id: "paywall", label: "Premium paywall", hint: "Crunchyroll as a free user" },
     { id: "paywall-quota", label: "Quota exhausted", hint: "No free parties left this week" },
     { id: "netflix-reauth", label: "Netflix re-auth", hint: "Session expired mid-browse" },
   ],
   party: [
-    { id: "party-live", label: "Live", hint: "Video playing + chat" },
-    { id: "party-idle", label: "Waiting", hint: "Party started, pick a video" },
+    { id: "party-live", label: "Live", hint: "Clean 16:9 · people + chat under" },
+    { id: "party-idle", label: "Waiting", hint: "Empty 16:9 until someone picks" },
     { id: "party-left", label: "Left · rejoin", hint: "Session still going without you" },
     { id: "party-yt", label: "YouTube ready", hint: "Browse YouTube — no party yet" },
     { id: "party-none", label: "None", hint: "Create or join" },
@@ -918,8 +862,8 @@ const PAGE_SCENES = {
 };
 
 const PAGE_LEGEND = {
-  home: "Tap a snapshot to load it below. Chips set the state; Phone / Foldable / iPad / iPhone Duo switch the frame. Tap pill / FAB / titles inside. Browse · empty is Hub Home with no accounts.",
-  party: "Same ExoPlayer shell as production — 16:9 on top, chat below. Host vs guest, members, invite link, overlays.",
+  home: "Home is across services. The header is the current provider — tap it to switch. Browse has logos above the dock. The Party tab is how you return to a live watch.",
+  party: "The movie stays clear. Friends sit in a Telegram-style row under the player — never on the picture.",
   profile: "Profile is the person; Settings is the knobs. What’s New and Sign out → Get Started live here.",
   accounts: "Manage accounts links and unlinks. Sign out lives once, in the confirm sheet.",
 };
@@ -948,6 +892,9 @@ function freshState() {
     disconnectMsg: null,
     quota: { crunchyroll: 1, paramount: 1 },
     role: "host",
+    unread: 3,
+    youCam: true,
+    youMic: true,
     paywallSource: null,
     paywallPid: null,
     paywallPeriod: "yearly",
@@ -1013,13 +960,26 @@ function applyScenario(state, name) {
     state.provider = "netflix";
     return;
   }
+  if (name === "apps") {
+    withAccounts();
+    state.party = "playing";
+    state.tab = "apps";
+    return;
+  }
+  if (name === "inbox") {
+    withAccounts();
+    state.party = "playing";
+    state.tab = "inbox";
+    state.unread = 3;
+    return;
+  }
   if (name === "browse-empty") {
     state.youtubeLogin = true;
     state.conn = defaultConn("empty", { youtubeLogin: true });
     state.provider = null;
     state.filter = "netflix";
     state.party = "none";
-    state.tab = "browse";
+    state.tab = "apps";
     return;
   }
   if (name === "switcher") {
@@ -1220,19 +1180,20 @@ function applyScenario(state, name) {
 
 function protoNav(state) {
   if (state.tab === "auth") return "";
-  const any = Object.values(state.conn).some(Boolean);
-  const fabPid = any ? state.provider : null;
-  return nav(state.tab === "accounts" ? "profile" : state.tab, fabPid, {
+  return nav(state.tab, null, {
     conn: state.conn,
     youtubeLogin: !!state.youtubeLogin,
     partyBadge: state.party === "playing" || state.party === "idle" || state.party === "left",
+    inboxBadge: !!state.unread,
+    live: state.tab === "party" && (state.party === "playing" || state.party === "idle"),
+    provider: state.provider,
   });
 }
 
 function dualRightTab(state) {
   if (state.tab && state.tab !== "home") return state.tab;
   if (state.party === "playing" || state.party === "idle" || state.party === "left") return "party";
-  return "browse";
+  return "apps";
 }
 
 function protoPhoneHtml(state, extraClass = "") {
@@ -1288,7 +1249,7 @@ function sceneChipRows(scenes) {
 function inferPage(options = {}) {
   if (options.page) return options.page;
   if (options.tab === "party") return "party";
-  if (options.tab === "profile" || options.tab === "settings") return "profile";
+  if (options.tab === "profile" || options.tab === "settings" || options.tab === "you") return "profile";
   if (options.tab === "accounts") return "accounts";
   return "home";
 }
@@ -1372,6 +1333,69 @@ function mountInteractive(root, options = {}) {
   }
   fsObserver.observe(wrap);
 
+  let trendingLeadAnim = 0;
+
+  function trendingTabsRow() {
+    return wrap.querySelector(".phone .d-trending .ptabs") || wrap.querySelector(".phone .ptabs");
+  }
+
+  function trendingLeadTarget(row, tab) {
+    const pad = parseFloat(getComputedStyle(row).paddingLeft) || 0;
+    const maxScroll = Math.max(0, row.scrollWidth - row.clientWidth);
+    return Math.max(0, Math.min(maxScroll, tab.offsetLeft - pad));
+  }
+
+  function scrollTrendingTabToLead(row, tab, smooth) {
+    const sel = tab || row.querySelector('.ptab[aria-selected="true"]');
+    if (!sel || !row.clientWidth) return;
+    const target = trendingLeadTarget(row, sel);
+    if (Math.abs(target - row.scrollLeft) < 1) return;
+    trendingLeadAnim += 1;
+    const gen = trendingLeadAnim;
+    if (!smooth) {
+      row.scrollLeft = target;
+      return;
+    }
+    const start = row.scrollLeft;
+    const dist = target - start;
+    const ms = 420;
+    const t0 = performance.now();
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    function step(now) {
+      if (gen !== trendingLeadAnim) return;
+      const p = Math.min(1, (now - t0) / ms);
+      row.scrollLeft = start + dist * ease(p);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    step(t0);
+    requestAnimationFrame(step);
+    setTimeout(() => {
+      if (gen !== trendingLeadAnim) return;
+      row.scrollLeft = target;
+    }, ms);
+  }
+
+  function applyTrendingFilter(tab) {
+    const next = tab.dataset.p;
+    if (!next) return;
+    const row = tab.closest(".ptabs");
+    state.filter = next;
+    if (row) {
+      row.querySelectorAll(".ptab").forEach((el) => {
+        el.setAttribute("aria-selected", el.dataset.p === next ? "true" : "false");
+      });
+    }
+    const gridWrap = wrap.querySelector(".phone .d-trending .grid-wrap");
+    if (gridWrap) gridWrap.innerHTML = protoGrid(state);
+    if (row) scrollTrendingTabToLead(row, tab, true);
+  }
+
+  function restoreTrendingTabs() {
+    const row = trendingTabsRow();
+    if (!row) return;
+    scrollTrendingTabToLead(row, null, false);
+  }
+
   function render() {
     wrap.innerHTML = `<div class="proto-phone-sizer">${protoPhoneHtml(state)}</div>`;
     stage.querySelectorAll("[data-scenario]").forEach((c) => {
@@ -1384,6 +1408,7 @@ function mountInteractive(root, options = {}) {
     stage.querySelectorAll("[data-device]").forEach((c) => {
       c.classList.toggle("on", c.dataset.device === (state.device || "compact"));
     });
+    restoreTrendingTabs();
     requestAnimationFrame(() => requestAnimationFrame(fitFsPhone));
   }
 
@@ -1483,14 +1508,14 @@ function mountInteractive(root, options = {}) {
       return;
     }
 
+    const trendingTab = e.target.closest(".ptab");
+    if (trendingTab && wrap.contains(trendingTab) && trendingTab.dataset.p) {
+      applyTrendingFilter(trendingTab);
+      return;
+    }
+
     const t = e.target.closest("[data-action]");
     if (!t || !wrap.contains(t)) {
-      /* trending chips */
-      const tab = e.target.closest(".ptab");
-      if (tab && wrap.contains(tab)) {
-        state.filter = tab.dataset.p;
-        render();
-      }
       return;
     }
 
@@ -1751,18 +1776,34 @@ function mountInteractive(root, options = {}) {
       return;
     }
     if (action === "nav") {
-      state.tab = t.dataset.tab;
+      state.tab = t.dataset.tab === "you" ? "profile" : t.dataset.tab;
       state.sheet = null;
+      if (t.dataset.tab === "inbox") state.unread = 0;
       render();
       return;
     }
-    if (action === "fab") {
+    if (action === "fab" || action === "open-browse") {
       if (!Object.values(state.conn).some(Boolean)) {
         state.sheet = "switcher";
       } else {
         state.tab = "browse";
         state.sheet = null;
       }
+      render();
+      return;
+    }
+    if (action === "toggle-cam") {
+      state.youCam = !state.youCam;
+      render();
+      return;
+    }
+    if (action === "toggle-mic") {
+      state.youMic = !state.youMic;
+      render();
+      return;
+    }
+    if (action === "read-inbox") {
+      state.unread = 0;
       render();
       return;
     }
@@ -1788,12 +1829,12 @@ function mountInteractive(root, options = {}) {
         state.conn[pid] = true;
         state.provider = pid;
         state.sheet = null;
-        state.tab = "browse";
+        state.tab = state.tab === "apps" ? "apps" : "browse";
         protoToast(stage, "Opening " + p.name + " sign-in");
       } else {
         state.provider = pid;
         state.sheet = null;
-        state.tab = "browse";
+        if (state.tab !== "apps" && state.tab !== "browse") state.tab = "home";
       }
       render();
       return;
@@ -1940,10 +1981,10 @@ function mountInteractive(root, options = {}) {
 function mountDeviceGallery(root) {
   if (!root) return;
   const devices = [
-    { id: "compact", label: "Phone", hint: "Compact · bottom bar. Posters stay 112×168." },
+    { id: "compact", label: "Phone", hint: "Compact · bottom bar. Titles stay 16:9." },
     { id: "medium", label: "Foldable", hint: "Cover / fold outer · more columns, same tile size." },
     { id: "expanded", label: "iPad", hint: "Nav rail · party + catalog side by side." },
-    { id: "dual", label: "iPhone Duo", hint: "Two phones + hinge. Home on the left, Party/Browse on the right." },
+    { id: "dual", label: "iPhone Duo", hint: "Two phones + hinge. Home on the left, Party/Apps on the right." },
   ];
   root.className = "device-gallery";
   root.innerHTML = devices.map((d) => {

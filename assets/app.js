@@ -124,8 +124,8 @@ function pmark(provider, cls = "") {
   return `<span class="pmark ${cls}" ${style}>${p.mark}</span>`;
 }
 
-/* shape: "tall" | "wide" | "hero" */
-function poster(item, provider, shape = "tall", opts = {}) {
+/* shape: "wide" (16:9 titles) | "hero". Portrait "tall" is unused — movies are landscape. */
+function poster(item, provider, shape = "wide", opts = {}) {
   const p = PROVIDERS[provider];
   const locked = opts.locked || !p.connected;
   return `
@@ -158,12 +158,36 @@ function avatars(count, size) {
 }
 
 const ICONS = {
-  settings: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.4.64.73.83"/></svg>`,
   home: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.2 12 3l9 7.2V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>`,
-  party: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12a7 7 0 0 1-7 7H8l-5 3 1.4-4.2A7 7 0 0 1 3 12a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7z"/><path d="m10.5 9 4.5 3-4.5 3z" fill="currentColor" stroke="none"/></svg>`,
-  /* Teleparty alien / mask — matches product, not a generic person silhouette */
-  profile: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="13.2" rx="6.8" ry="7.4"/><path d="M8.2 6.8 6.4 3.4M15.8 6.8l1.8-3.4"/><circle cx="9.6" cy="12.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="14.4" cy="12.2" r="1.15" fill="currentColor" stroke="none"/><path d="M10.2 16.4c.55.55 1.2.85 1.8.85s1.25-.3 1.8-.85"/></svg>`,
+  party: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="9" r="2.4"/><circle cx="16" cy="9" r="2.4"/><path d="M4.5 18c.6-2.4 2.6-4 5.5-4s4.9 1.6 5.5 4"/><path d="M14 14.2c1.2-.7 2.7-1 4.2-.7 2 .5 3.4 1.9 3.8 3.5"/></svg>`,
+  apps: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="6" height="6" rx="1.4"/><rect x="14" y="4" width="6" height="6" rx="1.4"/><rect x="4" y="14" width="6" height="6" rx="1.4"/><rect x="14" y="14" width="6" height="6" rx="1.4"/></svg>`,
+  inbox: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  search: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.2"/><path d="M16 16.5 20.2 20.5"/></svg>`,
+  send: `<svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M3.2 20.8 21 12 3.2 3.2v6.7L14.4 12 3.2 14.1z"/></svg>`,
+  you: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="13.2" rx="6.8" ry="7.4"/><path d="M8.2 6.8 6.4 3.4M15.8 6.8l1.8-3.4"/><circle cx="9.6" cy="12.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="14.4" cy="12.2" r="1.15" fill="currentColor" stroke="none"/><path d="M10.2 16.4c.55.55 1.2.85 1.8.85s1.25-.3 1.8-.85"/></svg>`,
+  cam: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10.5 21 8v8l-5-2.5z"/></svg>`,
+  camOff: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h10v10H3zM16 10.5 21 8v8l-5-2.5zM3 3l18 18"/></svg>`,
+  mic: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg>`,
+  micOff: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M4 4l16 16"/></svg>`,
 };
+ICONS.profile = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.2"/><path d="M5.4 19c1.15-3.15 3.4-4.75 6.6-4.75S18.45 15.85 19.6 19"/></svg>`;
+ICONS.invite = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.1 2.8-4.7 5.5-4.7s4.8 1.6 5.5 4.7"/><path d="M17 7.5v6M14 10.5h6"/></svg>`;
+ICONS.settings = ICONS.you;
+
+const INBOX_ITEMS = [
+  { id: "inv", unread: true, title: "Priya invited you", body: "Join Aarav’s party on Crunchyroll", when: "2m" },
+  { id: "watch", unread: true, title: "Kabir started watching", body: "Solo Leveling · Crunchyroll", when: "18m" },
+  { id: "nf", unread: true, title: "Netflix session expired", body: "Reconnect to keep hosting parties", when: "1h" },
+  { id: "quota", unread: false, title: "1 free Crunchyroll party left", body: "Resets Monday", when: "1d" },
+];
+
+const HUDDLE = [
+  { n: "You", c: "#e2416f", cam: true, mic: true },
+  { n: "Priya", c: "#7b3fd4", cam: true, mic: false },
+  { n: "Kabir", c: "#00a8e1", cam: false, mic: true },
+  { n: "Meera", c: "#1ce783", cam: false, mic: false },
+  { n: "Rohan", c: "#f47521", cam: true, mic: true },
+];
 
 function statusBar() {
   return `<div class="status-bar"><span>20:43</span>
@@ -179,15 +203,17 @@ function providerTabs(sel, opts = {}) {
     ${opts.all === false ? "" : `<span class="ptab" data-p="all" aria-selected="${sel === "all"}">All</span>`}
     ${ids.map((p) => `<span class="ptab ${isLinked(p, opts) ? "" : "off"}" data-p="${p}"
         aria-selected="${sel === p}">${pmark(p)}${PROVIDERS[p].name}</span>`).join("")}
+    <span class="ptabs-lead-pad" aria-hidden="true"></span>
   </div>`;
 }
 
 /* ---------- Browse tab: provider's own page inside the web view ---------- */
 
-function webviewPage(pid) {
+function webviewPage(pid, mode = {}) {
   const p = PROVIDERS[pid];
   const items = TRENDING[pid] || TRENDING.netflix;
   const hero = items[0];
+  const embedded = !!mode.embedded;
   const row = (label, list) => `
     <div class="wv-row">
       <div class="lbl">${label}</div>
@@ -197,15 +223,13 @@ function webviewPage(pid) {
           <span class="wv-tile-t">${t.title}</span>
         </div>`).join("")}</div>
     </div>`;
-  return `
-    <div class="wv">
+  const brand = embedded ? "" : `
       <div class="wv-brand">
         <span class="logo" style="color:${p.color}">${p.name}</span>
-        <div class="row gap12">
-          <span class="wv-ico">⌕</span>
-          <span class="wv-avatar" style="background:${p.color}"></span>
-        </div>
-      </div>
+        <span class="wv-avatar" style="background:${p.color}"></span>
+      </div>`;
+  return `
+    <div class="wv ${embedded ? "embedded" : ""}">${brand}
       <div class="wv-cats"><span class="on">Home</span><span>Series</span><span>Films</span><span>My list</span></div>
       <div class="wv-hero">
         <div class="art" style="${art(hero.title)}"></div>
@@ -244,7 +268,7 @@ function webviewLogin(pid) {
 }
 
 /* Browse chrome — deliberately NOT an address bar. Service identity + back only.
-   Switching services is done via the pill → Switch Services sheet. */
+   Switching services is done via the Now-on chip or the Apps tab. */
 function browseChrome(pid) {
   const p = PROVIDERS[pid];
   return `<div class="bchrome">
@@ -449,12 +473,12 @@ function switcherSheet(current, opts = {}) {
     ? (opts.youtubeLogin
       ? "Sign in to a service you watch."
       : "YouTube works without signing in. Add Netflix, Prime, and more below.")
-    : "Tap a service to switch. + means you haven’t added it yet.";
+    : "Tap an app to browse its titles. Changing app while a video is playing asks first.";
 
   return `<div class="scrim" data-action="close-sheet"></div>
     <div class="sheet sheet-switch">
       <div class="sheet-grab"></div>
-      <div class="sheet-t">${empty || yours.length === 0 ? "Connect a service" : "Switch Services"}</div>
+      <div class="sheet-t">${empty || yours.length === 0 ? "Connect a service" : "Switch app"}</div>
       <p class="svc-lead">${lead}</p>
       ${quotaHint}
       ${body}
@@ -463,21 +487,115 @@ function switcherSheet(current, opts = {}) {
     </div>`;
 }
 
-/* Header pill — white mono mark for chrome consistency (designer). */
-function servicePill(pid, opts = {}) {
+function nowChip(pid, opts = {}) {
   if (!pid || !PROVIDERS[pid] || !isLinked(pid, opts)) {
-    return `<button class="service-chip connect-chip" data-action="open-switcher" type="button"><span class="plus">+</span><span>Add a service</span></button>`;
+    return `<button class="now-chip connect-chip" data-action="open-switcher" type="button"><span class="plus">+</span><span>Connect</span></button>`;
   }
   const p = PROVIDERS[pid];
-  return `<button class="service-chip" data-action="open-switcher" type="button">${pmark(pid, "mono round")}<span>${p.name.toLowerCase()}</span><span class="chev">▼</span></button>`;
+  return `<button class="now-chip" data-action="open-switcher" type="button">${pmark(pid)}<span>${p.name}</span><span class="now-chev" aria-hidden="true">▾</span></button>`;
 }
 
-/* FAB glyph — white mono on gradient; Tp when nothing connected. */
-function fabGlyph(pid, opts = {}) {
-  if (!pid || !PROVIDERS[pid]) {
-    return `<span class="pmark mono tp-mark">Tp</span>`;
+function workspaceSwitch(pid, opts = {}) {
+  if (!pid || !PROVIDERS[pid] || !isLinked(pid, opts)) {
+    return `<button class="ws-switch" data-action="open-switcher" type="button">
+      <span class="ws-logo plus">+</span>
+      <span class="ws-name">Connect</span>
+      <span class="ws-chev" aria-hidden="true">▾</span>
+    </button>`;
   }
-  return `<span class="pmark mono">${PROVIDERS[pid].mark}</span>`;
+  const p = PROVIDERS[pid];
+  return `<button class="ws-switch" data-action="open-switcher" type="button">
+    ${pmark(pid, "round")}
+    <span class="ws-name">${p.name}</span>
+    <span class="ws-chev" aria-hidden="true">▾</span>
+  </button>`;
+}
+
+function appHead(title, state = {}, opts = {}) {
+  const any = state.conn && Object.values(state.conn).some(Boolean);
+  const pid = any ? (state.provider || "youtube") : null;
+  if (title === "Home") {
+    return `<div class="app-head workspace">
+      ${workspaceSwitch(pid, opts)}
+    </div>`;
+  }
+  return `<div class="app-head">
+    <h1>${title}</h1>
+    <div class="app-head-actions">${nowChip(pid, opts)}</div>
+  </div>`;
+}
+
+function huddlePeople(state, count) {
+  return HUDDLE.slice(0, count).map((m) => {
+    if (m.n !== "You") return m;
+    return Object.assign({}, m, {
+      cam: state.youCam !== false,
+      mic: state.youMic !== false,
+    });
+  });
+}
+
+function huddleStrip(state, total = 5) {
+  const cap = 5;
+  const shown = Math.min(cap, total);
+  const overflow = Math.max(0, total - cap);
+  const people = huddlePeople(state, shown);
+  const avs = people.map((m) =>
+    `<span class="av huddle-av" style="background:${m.c}">${m.n[0]}</span>`
+  ).join("") + (overflow > 0
+    ? `<span class="av huddle-av more">+${overflow}</span>`
+    : "");
+  return `<div class="huddle">
+    <div class="avatars huddle-avs">${avs}</div>
+    <button class="huddle-invite" data-action="open-invite" type="button" aria-label="Invite">${ICONS.invite}</button>
+  </div>`;
+}
+
+function wireCatalog(body, pid) {
+  return body
+    .replace(/class="wv-tile"/g, 'class="wv-tile" data-action="open-title"')
+    .replace(/data-content-id="([^"]+)"/g, 'data-id="$1" data-p="' + pid + '"')
+    .replace(
+      /class="wv-btn block" style="background:([^"]+)"/,
+      'class="wv-btn block" style="background:$1" data-action="complete-signin" data-p="' + pid + '"'
+    );
+}
+
+function tvAppTile(pid, current, opts = {}) {
+  const p = PROVIDERS[pid];
+  const connected = isLinked(pid, opts);
+  const active = pid === current && connected;
+  return `<button class="tv-app ${active ? "current" : ""}" data-action="pick-service" data-p="${pid}" type="button">
+    <span class="tv-tile" style="background:${p.color}">${p.mark}${connected ? `<span class="tv-tick">✓</span>` : ""}</span>
+    <span class="tv-nm">${p.name}</span>
+  </button>`;
+}
+
+function tvAppsGrid(current, opts = {}) {
+  const recents = PROVIDER_ORDER.filter((p) => isLinked(p, opts)).slice(0, 4);
+  const rest = PROVIDER_ORDER.filter((p) => !recents.includes(p));
+  const currentP = current && PROVIDERS[current] ? PROVIDERS[current] : null;
+  const hero = currentP ? `<div class="tv-hero">
+      <div class="tv-hero-mark" style="background:${currentP.color}">${currentP.mark}</div>
+      <div>
+        <h3>${currentP.name}</h3>
+        <p>${opts.playing ? "Playing in the party" : "Ready to browse"}</p>
+      </div>
+      <button class="btn ghost sm" data-action="open-browse" type="button">Open</button>
+    </div>` : "";
+  return `${hero}
+    ${recents.length ? `<div class="sec-head" style="padding:18px 0 10px"><span class="sec-title big">Recently used</span></div>
+      <div class="tv-grid">${recents.map((p) => tvAppTile(p, current, opts)).join("")}</div>` : ""}
+    <div class="sec-head" style="padding:18px 0 10px"><span class="sec-title big">All apps</span></div>
+    <div class="tv-grid">
+      ${rest.map((p) => tvAppTile(p, current, opts)).join("")}
+      <button class="tv-app add" data-action="open-switcher" type="button"><span class="tv-tile">+</span><span class="tv-nm">Add</span></button>
+    </div>`;
+}
+
+/* Header pill kept as an alias for older snapshots. */
+function servicePill(pid, opts = {}) {
+  return nowChip(pid, opts);
 }
 
 function premiumBlock() {
@@ -493,32 +611,38 @@ function premiumBlock() {
   </div>`;
 }
 
-/* activeTab: settings | home | browse | party | profile.  fabProvider drives the FAB glyph. */
-function nav(activeTab, fabProvider, opts = {}) {
+/* Capsule dock: Profile · Home · Browse · Party.
+   On Browse, linked services sit in a second frosted pill above the tabs. */
+function nav(activeTab, _unused, opts = {}) {
+  const resolved = activeTab === "browse" ? "apps"
+    : (activeTab === "profile" || activeTab === "accounts" || activeTab === "settings" || activeTab === "you") ? "profile"
+    : activeTab;
   const item = (id, label, badge) => `
-    <button class="nav-item ${activeTab === id ? "active" : ""}" data-action="nav" data-tab="${id}" type="button">
+    <button class="nav-item ${resolved === id ? "active" : ""}" data-action="nav" data-tab="${id}" type="button">
       <span class="ico-wrap">${ICONS[id]}${badge ? '<span class="ndot"></span>' : ""}</span>
-      <span>${label}</span>
+      <span class="label">${label}</span>
     </button>`;
-  const p = fabProvider && PROVIDERS[fabProvider];
-  const linked = p && isLinked(fabProvider, opts);
-  const label = opts.fabLabel || (linked ? "Browse" : p ? "Sign in" : "Connect");
-  const title = linked
-    ? `Opens ${p.name}`
-    : p
-      ? `Sign in to ${p.name}`
-      : "Connect a service";
+  const linked = PROVIDER_ORDER.filter((p) => isLinked(p, opts));
+  const current = opts.provider || linked[0];
+  const services = (resolved === "apps" && linked.length)
+    ? `<div class="nav-services" role="list" aria-label="Switch service">${linked.map((pid) => {
+        const p = PROVIDERS[pid];
+        return `<button class="nav-svc ${pid === current ? "on" : ""}" data-action="pick-service" data-p="${pid}" type="button" aria-label="${p.name}">
+          <span class="nav-svc-logo" style="background:${p.color}">${p.mark}</span>
+        </button>`;
+      }).join("")}</div>`
+    : "";
   return `
-    <div class="nav">
-      ${item("settings", "Settings")}
-      ${item("home", "Home")}
-      <div class="nav-item fab-slot"></div>
-      ${item("party", "Party", opts.partyBadge)}
-      ${item("profile", "Profile")}
-      <button class="fab ${activeTab === "browse" ? "on" : ""} ${p ? "" : "empty"}" data-action="fab" type="button" title="${title}">
-        ${fabGlyph(p ? fabProvider : null, opts)}
-      </button>
-      <span class="fab-label ${activeTab === "browse" ? "on" : ""}">${label}</span>
+    <div class="nav-cluster${opts.live ? " live" : ""}${services ? " with-apps" : ""}">
+      ${services}
+      <nav class="nav">
+        <div class="nav-tabs">
+          ${item("profile", "Profile")}
+          ${item("home", "Home")}
+          ${item("apps", "Browse")}
+          ${item("party", "Party", opts.partyBadge)}
+        </div>
+      </nav>
     </div>`;
 }
 

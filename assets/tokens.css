@@ -64,8 +64,8 @@
      Dual               two logical panes (iPhone Duo, separating vertical hinge) */
   --bp-medium: 600px;
   --bp-expanded: 840px;
-  --tile-poster-w: 112px;
-  --tile-poster-h: 168px;
+  --tile-poster-w: 168px;
+  --tile-poster-h: 94px;
   --tile-jump-w: 168px;
   --tile-svc-w: 152px;
   --nav-rail-w: 76px;

@@ -5,15 +5,15 @@
 <title>Party · Teleparty revamp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/tokens.css">
-<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/tokens.css?v=nav15">
+<link rel="stylesheet" href="assets/app.css?v=nav15">
 </head>
 <body>
 
 <div class="page-head">
-  <div class="eyebrow">Party tab · ExoPlayer shell</div>
-  <h1>Player on top, chat below</h1>
-  <p>Same structure as <code>HubPartyFragment</code>: 16:9 player → people bar → chat → composer. Snapshots of every Party state, then a live phone.</p>
+  <div class="eyebrow">Party tab · watch together</div>
+  <h1>The film stays clear</h1>
+  <p>YouTube, Telegram, and WhatsApp don’t put faces on the picture. 16:9 player on top; people and chat underneath — the layout phones already know in the US, LatAm, the Middle East, India, and the Philippines.</p>
 </div>
 
 <div class="crumbs">
@@ -23,6 +23,7 @@
   <a class="crumb" href="profile-settings.html">Profile</a>
   <a class="crumb" href="manage-accounts.html">Accounts</a>
   <a class="crumb" href="components.html">Components</a>
+  <a class="crumb explore" href="astryx.html">Astryx</a>
 </div>
 
 <div class="section-label">All states</div>
@@ -37,20 +38,24 @@
   <h2>What changes vs today</h2>
   <div class="note-grid">
     <div class="note good">
-      <h4>Same architecture</h4>
-      <p>ExoPlayer keeps the 16:9 slot. Chat + invite / cam / mic / GIF / reactions stay under it.</p>
+      <h4>Nothing on the picture</h4>
+      <p>No floating faces. Telegram / WhatsApp keep people in a row; YouTube keeps chat under the video. We do both.</p>
+    </div>
+    <div class="note good">
+      <h4>People bar</h4>
+      <p>Avatars + cam/mic live under the player. Tap someone for the members list. Speaking gets a green ring.</p>
+    </div>
+    <div class="note good">
+      <h4>Chat like Telegram</h4>
+      <p>Name in color, message after it. Composer is GIF + field + send — cam/mic are not in the text field.</p>
     </div>
     <div class="note good">
       <h4>Idle overlay</h4>
       <p>Replaces the flat pink banner + white button with Home CTA language (primary pill, free/premium gradient).</p>
     </div>
     <div class="note good">
-      <h4>Live state</h4>
-      <p>Player shows title, provider, progress — then chat. Browse is how you pick; Party is where it plays.</p>
-    </div>
-    <div class="note good">
       <h4>Guest · not signed in</h4>
-      <p>If the party’s service isn’t linked, the player shows <b>Not Signed In</b> and a Sign in button. Chat stays.</p>
+      <p>If the party’s service isn’t linked, the stage shows <b>Not Signed In</b> and a Sign in button. Chat stays.</p>
     </div>
     <div class="note good">
       <h4>Host vs guest</h4>
@@ -60,21 +65,17 @@
       <h4>Loading / disconnected / switch / unsupported</h4>
       <p>Buffering overlay, Retry vs Ok, service-switch warning, and Video Unavailable for services not on mobile.</p>
     </div>
-    <div class="note">
-      <h4>People bar</h4>
-      <p>Thin strip under the player: who’s here, Invite, Leave — without eating the player.</p>
-    </div>
   </div>
 </div>
 
-<script src="assets/app.js"></script>
-<script src="assets/proto.js"></script>
+<script src="assets/app.js?v=nav15"></script>
+<script src="assets/proto.js?v=nav15"></script>
 <script>
 mountPage({
   gallery: document.getElementById("gallery"),
   play: document.getElementById("proto"),
   page: "party",
-  start: "party-idle",
+  start: "party-live",
 });
 </script>
 </body>

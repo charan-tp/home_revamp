@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Astryx exploration · Teleparty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css?v=pty1">
+<link rel="stylesheet" href="assets/app.css?v=pty1">
+<link rel="stylesheet" href="assets/astryx.css?v=pty1">
+</head>
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Exploration · not source of truth</div>
+  <h1>Astryx pass</h1>
+  <p>A parallel Home built on <a href="https://github.com/facebook/astryx" style="color:var(--brand-pink);font-weight:600">Meta Astryx</a> gothic tokens and conventions — quiet elevation, concentric radius, 4px spacing, semantic color. Option D is unchanged. This page is here so we can judge the system before committing to it.</p>
+</div>
+
+<div class="crumbs">
+  <a class="crumb" href="index.html">Overview</a>
+  <a class="crumb" href="concept-d.html">Home</a>
+  <a class="crumb" href="party.html">Party</a>
+  <a class="crumb" href="profile-settings.html">Profile</a>
+  <a class="crumb" href="manage-accounts.html">Accounts</a>
+  <a class="crumb" href="components.html">Components</a>
+  <a class="crumb explore active" href="astryx.html">Astryx</a>
+</div>
+
+<div class="section-label">Should we use this?</div>
+<div class="ax-verdict">
+  <article>
+    <h3>What Astryx actually is</h3>
+    <p>A <b>React 19 + StyleX</b> design system (beta, v0.6). Gothic is dark-only: ink body <code>#101314</code>, ice text <code>#E8F1F6</code>, muted success/error, 12px container radius. It is guidance, not a lock-in. It cannot ship as a package in Compose or SwiftUI — we would port tokens and rules, not components.</p>
+  </article>
+  <article>
+    <h3>Why I’m unsure</h3>
+    <p>Raw gothic looks like a Meta admin surface, not Teleparty. The accent is ice-white, not magenta. Type (Fustat) and desaturated greens/reds will feel foreign next to our posters. Use the <b>Gothic ice</b> toggle in the playground to see that. Magenta is an overlay so the product still reads as us.</p>
+  </article>
+</div>
+
+<div class="section-label">What changed vs Option D</div>
+<div class="decisions">
+  <div class="drow"><div class="k">No FAB</div>
+    <div class="v">Five equal tabs, Slack-style: <b>Home · Party · Apps · Inbox · You</b>. Browse is no longer a center button. You pick a service in Apps, then watch from Home / Party.</div></div>
+  <div class="drow"><div class="k">Home</div>
+    <div class="v">Quiet header, small <b>Now on</b> chip (not a fat provider pill), inbox icon with badge. Party card is one container — poster, huddle, then your cam/mic. Jump back + trending stay, without nested cards.</div></div>
+  <div class="drow"><div class="k">Inbox</div>
+    <div class="v">Header icon is the glance shortcut (badge). Inbox tab is the list: invites, someone started watching, expired sessions, quota. Same destination either way.</div></div>
+  <div class="drow"><div class="k">Liquid glass dock</div>
+    <div class="v">Floating bar, 12px inset, blur + hairline + inner highlight. Active tab is a concentric inner pill — no colored glow (Astryx forbids glow as elevation).</div></div>
+  <div class="drow"><div class="k">Provider switcher</div>
+    <div class="v">The old wallpaper sheet is gone. <b>Apps</b> is an Apple TV / Smart TV grid: now-on hero, recently used, all apps, add. The Home chip opens the same grid as a sheet. Switching during a live video confirms first.</div></div>
+  <div class="drow"><div class="k">Party card AV</div>
+    <div class="v">Each avatar shows cam or muted-mic. Summary line: “3 cameras · 2 mics live”. Your Cam on / Mic on pills toggle on the card, Discord-huddle style.</div></div>
+</div>
+
+<div class="section-label">All states</div>
+<p class="section-lead">Click a phone to load it in the playground.</p>
+<div id="ax-gallery" class="ax-gallery"></div>
+
+<div class="section-label">Interactive</div>
+<p class="section-lead">Tap the glass dock, Now-on chip, inbox, app tiles, and cam/mic pills. Gothic ice vs Teleparty magenta is the design-system test.</p>
+<div id="ax-proto" class="ax-play"></div>
+
+<div class="notes">
+  <h2>How to read this</h2>
+  <div class="note-grid">
+    <div class="note good">
+      <h4>Portable bits</h4>
+      <p>4px spacing, concentric radii (dock 22 / tab 16), one card not a card-in-a-card, quiet shadows, semantic success/error instead of neon green/red. Those can land in Compose without Astryx.</p>
+    </div>
+    <div class="note good">
+      <h4>Don’t take as-is</h4>
+      <p>Fustat, ice accent, and the gray-green status colors. If we keep Astryx we’d theme it (they expect that) — gothic is a starting kit, not the Teleparty look.</p>
+    </div>
+    <div class="note good">
+      <h4>Apps vs FAB</h4>
+      <p>Slack puts the workspace switcher in the rail; Apple TV puts apps on a home grid. We combined those: Apps tab is the switcher, Home stays “what’s happening in the party.”</p>
+    </div>
+    <div class="note good">
+      <h4>Option D still ships</h4>
+      <p>Nothing on this page replaces <a href="concept-d.html">Home</a>. Use this to decide nav + switcher + inbox + AV status, then we fold the winners back into D / Compose.</p>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js?v=pty1"></script>
+<script src="assets/astryx.js?v=pty1"></script>
+<script>
+mountAstryx({
+  gallery: document.getElementById("ax-gallery"),
+  play: document.getElementById("ax-proto"),
+});
+</script>
+</body>
+</html>
