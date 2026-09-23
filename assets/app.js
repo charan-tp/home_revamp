@@ -1,5 +1,5 @@
 /* Shared mock data + render helpers for the three Home concepts.
-   Everything renders offline: poster art is generated from the title string
+   Catalog cards use local landscape stills; titles without one fall back to a generated wash.
    rather than loaded, so the file works with no network. */
 
 const PROVIDERS = {
@@ -100,9 +100,41 @@ const hash = (s) => {
   return Math.abs(h);
 };
 
-/* Deterministic "key art" so every poster looks distinct but stable.
-   Layered so it reads as moody film artwork rather than a flat colour blob. */
+/* Landscape stills for catalog titles. Anything unlisted keeps the generated wash. */
+const POSTERS = {
+  "London Has Fallen": "assets/posters/london-has-fallen.jpg",
+  "Dracula Untold": "assets/posters/dracula-untold.jpg",
+  "Wednesday": "assets/posters/wednesday.jpg",
+  "The Night Agent": "assets/posters/the-night-agent.jpg",
+  "Kaala Paani": "assets/posters/kaala-paani.jpg",
+  "Dhurandhar": "assets/posters/dhurandhar.jpg",
+  "Reacher": "assets/posters/reacher.jpg",
+  "Fallout": "assets/posters/fallout.jpg",
+  "Citadel": "assets/posters/citadel.jpg",
+  "Solo Leveling": "assets/posters/solo-leveling.jpg",
+  "Jujutsu Kaisen": "assets/posters/jujutsu-kaisen.jpg",
+  "Frieren": "assets/posters/frieren.jpg",
+  "One Piece": "assets/posters/one-piece.jpg",
+  "Andor": "assets/posters/andor.jpg",
+  "The Bear": "assets/posters/the-bear.jpg",
+  "Shogun": "assets/posters/shogun.jpg",
+  "Percy Jackson": "assets/posters/percy-jackson.jpg",
+  "The Last of Us": "assets/posters/the-last-of-us.jpg",
+  "The Penguin": "assets/posters/the-penguin.jpg",
+  "Dune: Prophecy": "assets/posters/dune-prophecy.jpg",
+  "Only Murders": "assets/posters/only-murders.jpg",
+  "Tulsa King": "assets/posters/tulsa-king.jpg",
+  "Special Ops: Lioness": "assets/posters/special-ops-lioness.jpg",
+  "The Night Manager": "assets/posters/the-night-manager.jpg",
+  "Aarya": "assets/posters/aarya.jpg",
+  "The Broken News": "assets/posters/the-broken-news.jpg",
+  "Sunflower": "assets/posters/sunflower.jpg",
+};
+
+/* Deterministic wash for titles that don't have a still (YouTube clips, etc.). */
 function art(title) {
+  const still = POSTERS[title];
+  if (still) return `background:url('${still}') center/cover no-repeat;`;
   const h = hash(title);
   const a = h % 360;
   const b = (h >> 3) % 360;
@@ -394,43 +426,39 @@ function hasLoginAccount(conn = {}, opts = {}) {
   return PROVIDER_ORDER.some((p) => !isOpen(p, opts) && !!conn[p]);
 }
 
-/* Netflix-style service switcher: current service is the “profile,” others sit in a row. */
-function switcherFace(pid, extraClass = "") {
-  const p = PROVIDERS[pid];
-  return `<button class="nf-face ${extraClass}" data-action="pick-service" data-p="${pid}" type="button">
-    ${pmark(pid, "face")}
-    <span class="nf-face-name">${p.name}</span>
-  </button>`;
-}
-
+/* Service picker: a wrapping grid (more columns as the sheet gets wider) plus Free / Premium filters. */
 function switcherSheet(current, opts = {}) {
-  const connected = PROVIDER_ORDER.filter((p) => isLinked(p, opts));
-  const available = PROVIDER_ORDER.filter((p) => !isLinked(p, opts));
-  const currentPid = connected.includes(current) ? current : (connected[0] || null);
-  const others = connected.filter((p) => p !== currentPid);
-
-  const hero = currentPid
-    ? `<button class="nf-hero" data-action="pick-service" data-p="${currentPid}" type="button">
-        ${pmark(currentPid, "hero")}
-        <span class="nf-hero-name">${PROVIDERS[currentPid].name}</span>
-      </button>`
-    : `<button class="nf-hero" data-action="open-accounts" type="button">
-        <span class="pmark hero plus">+</span>
-        <span class="nf-hero-name">Connect</span>
-      </button>`;
-
-  const faces = others.map((p) => switcherFace(p)).join("")
-    + available.map((p) => switcherFace(p, "add")).join("");
+  const filter = opts.filter || "all";
+  const ids = PROVIDER_ORDER.filter((pid) => {
+    const tier = PROVIDERS[pid].tier;
+    if (filter === "free") return tier !== "premium";
+    if (filter === "premium") return tier === "premium";
+    return true;
+  });
+  const chip = (id, label) => `<button class="picker-chip" data-action="switcher-filter" data-filter="${id}" aria-selected="${filter === id}" type="button">${label}</button>`;
+  const tiles = ids.map((pid) => {
+    const p = PROVIDERS[pid];
+    const on = pid === current;
+    const cls = ["picker-tile", on ? "on" : "", p.tier === "premium" ? "premium" : ""].filter(Boolean).join(" ");
+    return `<button class="${cls}" data-action="pick-service" data-p="${pid}" type="button">
+      ${p.tier === "premium" ? `<span class="picker-star" aria-hidden="true">★</span>` : ""}
+      <span class="picker-logo">${pmark(pid, "round")}</span>
+      <span class="picker-name">${p.name}</span>
+    </button>`;
+  }).join("");
 
   return `<div class="scrim" data-action="close-sheet"></div>
     <div class="sheet sheet-profiles">
-      <div class="nf-head">
-        <span class="nf-title">${currentPid ? "Services" : "Connect a service"}</span>
-        <button class="nf-x" data-action="close-sheet" type="button" aria-label="Close">${ICONS.close}</button>
+      <div class="picker-top">
+        <h2 class="picker-title">Teleparty</h2>
       </div>
-      <div class="nf-card">${hero}</div>
-      ${faces ? `<div class="nf-row">${faces}</div>` : ""}
-      <button class="nf-manage" data-action="open-accounts" type="button">Manage accounts</button>
+      <p class="picker-kicker">Choose a service</p>
+      <div class="picker-filters" role="tablist">
+        ${chip("all", "All")}
+        ${chip("free", "Free")}
+        ${chip("premium", "Premium")}
+      </div>
+      ${tiles ? `<div class="picker-grid">${tiles}</div>` : `<p class="picker-empty">No services in this filter.</p>`}
     </div>`;
 }
 
@@ -442,19 +470,34 @@ function nowChip(pid, opts = {}) {
   return `<button class="now-chip" data-action="open-switcher" type="button">${pmark(pid)}<span>${p.name}</span><span class="now-chev" aria-hidden="true">▾</span></button>`;
 }
 
+/* New-user v1 header: the word Teleparty, with a looping mark that crossfades every provider. */
+function telepartyBrandSwitch() {
+  const ids = PROVIDER_ORDER;
+  const step = 1.2;
+  const chev = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+  return `<button class="ws-switch brand-home" data-action="open-switcher" type="button" aria-label="Teleparty">
+    <span class="brand-lottie" aria-hidden="true">
+      ${ids.map((p, i) => `<span class="brand-frame" style="animation-delay:${(i * step).toFixed(1)}s">${pmark(p, "round")}</span>`).join("")}
+    </span>
+    <span class="ws-name">Teleparty</span>
+    <span class="ws-chev" aria-hidden="true">${chev}</span>
+  </button>`;
+}
+
 function workspaceSwitch(pid, opts = {}) {
-  if (!pid || !PROVIDERS[pid] || !isLinked(pid, opts)) {
+  const linked = opts.forceHeader || isLinked(pid, opts);
+  if (!pid || !PROVIDERS[pid] || !linked) {
     return `<button class="ws-switch" data-action="open-switcher" type="button">
       <span class="ws-logo plus">+</span>
       <span class="ws-name">Connect</span>
-      <span class="ws-chev" aria-hidden="true">▾</span>
+      <span class="ws-chev" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
     </button>`;
   }
   const p = PROVIDERS[pid];
   return `<button class="ws-switch" data-action="open-switcher" type="button">
     ${pmark(pid, "round")}
     <span class="ws-name">${p.name}</span>
-    <span class="ws-chev" aria-hidden="true">▾</span>
+    <span class="ws-chev" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
   </button>`;
 }
 
@@ -462,8 +505,16 @@ function appHead(title, state = {}, opts = {}) {
   const any = state.conn && Object.values(state.conn).some(Boolean);
   const pid = any ? (state.provider || "youtube") : null;
   if (title === "Home") {
+    if (state.brandHome) {
+      return `<div class="app-head workspace">${telepartyBrandSwitch()}</div>`;
+    }
+    const any = state.conn && Object.values(state.conn).some(Boolean);
+    const pid = state.forceHeader && state.provider
+      ? state.provider
+      : (any ? (state.provider || "youtube") : null);
+    const headOpts = state.forceHeader ? Object.assign({}, opts, { forceHeader: true }) : opts;
     return `<div class="app-head workspace">
-      ${workspaceSwitch(pid, opts)}
+      ${workspaceSwitch(pid, headOpts)}
     </div>`;
   }
   return `<div class="app-head">
@@ -558,8 +609,7 @@ function premiumBlock() {
   </div>`;
 }
 
-/* Capsule dock: Profile · Home · Browse in the pill, Party as the orb on the right.
-   On Browse, linked services sit in a second frosted pill above the tabs. */
+/* Capsule dock: Profile · Home · Browse in the pill, Party as the orb on the right. */
 function nav(activeTab, _unused, opts = {}) {
   const resolved = activeTab === "browse" ? "apps"
     : (activeTab === "profile" || activeTab === "accounts" || activeTab === "settings" || activeTab === "you") ? "profile"
@@ -569,20 +619,9 @@ function nav(activeTab, _unused, opts = {}) {
       <span class="ico-wrap">${ICONS[id]}${badge ? '<span class="ndot"></span>' : ""}</span>
       <span class="label">${label}</span>
     </button>`;
-  const linked = PROVIDER_ORDER.filter((p) => isLinked(p, opts));
-  const current = opts.provider || linked[0];
-  const services = (resolved === "apps" && linked.length)
-    ? `<div class="nav-services" role="list" aria-label="Switch service">${linked.map((pid) => {
-        const p = PROVIDERS[pid];
-        return `<button class="nav-svc ${pid === current ? "on" : ""}" data-action="pick-service" data-p="${pid}" type="button" aria-label="${p.name}">
-          <span class="nav-svc-logo" style="background:${p.color}">${p.mark}</span>
-        </button>`;
-      }).join("")}</div>`
-    : "";
   const partyOn = resolved === "party";
   return `
-    <div class="nav-cluster${opts.live ? " live" : ""}${services ? " with-apps" : ""}">
-      ${services}
+    <div class="nav-cluster${opts.live ? " live" : ""}">
       <div class="nav-dock">
         <nav class="nav">
           <div class="nav-tabs">

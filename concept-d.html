@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <title>Home · Teleparty revamp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/tokens.css?v=nav17">
-<link rel="stylesheet" href="assets/app.css?v=nav17">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css?v=nav40">
+<link rel="stylesheet" href="assets/app.css?v=nav40">
 </head>
 <body>
 
@@ -47,15 +47,15 @@
     </div>
     <div class="note good">
       <h4>Provider switcher, not a Home title</h4>
-      <p>Home’s header is the current service — icon, name, dropdown. Tap it and a Netflix-style overlay opens: current service large, other services in a row, Manage accounts.</p>
+      <p>Tap the header to open the service grid. Columns follow the sheet width — three on a phone, more on Foldable and iPad. Filter with <b>All</b>, <b>Free</b>, and <b>Premium</b>. A gold star marks premium. The current service has the pink ring.</p>
     </div>
     <div class="note good">
-      <h4>New user: connect card, not locked trending</h4>
-      <p>We don’t scrape catalogs you aren’t signed into. Empty Home uses the dashed <b>Connect a service</b> card. Trending appears after a service is linked (YouTube counts when it’s open).</p>
+      <h4>New user, and New user v1</h4>
+      <p>New user uses the same provider header as <b>No party yet</b> — icon, name, chevron — and skips <b>Continue watching</b>. Trending and Switch to Premium stay. The connect card is not on Home. <b>New user v1</b> titles the page Teleparty, also skips Continue watching, and that connect card lives centered on Browse.</p>
     </div>
     <div class="note good">
       <h4>Browse is the service WebView</h4>
-      <p>No Teleparty hub, search, inbox, or Return card over the WebView. Switch from the service logos above the dock. Home’s provider name (with ▾) still opens the Netflix-style overlay. The Party tab is how you go back to a live watch.</p>
+      <p>No Teleparty hub, search, inbox, or Return card over the WebView. Home’s provider name (with ▾) still opens the service grid. The Party tab is how you go back to a live watch.</p>
     </div>
     <div class="note good">
       <h4>Trending tabs</h4>
@@ -72,8 +72,8 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=nav17"></script>
-<script src="assets/proto.js?v=nav17"></script>
+<script src="assets/app.js?v=nav40"></script>
+<script src="assets/proto.js?v=nav40"></script>
 <script>
 mountPage({
   gallery: document.getElementById("gallery"),

@@ -97,29 +97,59 @@ function protoConnectCard() {
     </div>`;
 }
 
+function contentDuration(sub) {
+  if (!sub) return "";
+  const clock = sub.match(/(\d+\s*h(?:\s*\d+\s*m)?|\d+\s*m)\b/i);
+  if (clock) return clock[1].replace(/\s+/g, " ");
+  return sub;
+}
+
+function titleCard(opts) {
+  const { id, provider, title, sub, pct, kind = "trend" } = opts;
+  const cls = kind === "cw" ? "cw-card" : "trend-card";
+  return `<button class="${cls}" data-action="open-title" data-id="${id}" data-p="${provider}" type="button">
+    <div class="th">
+      <div class="art" style="${art(title)}"></div>
+      <span class="badge">${pmark(provider)}</span>
+      <span class="play sm" aria-hidden="true"></span>
+    </div>
+    <div class="meta">
+      <div class="txt">
+        <div class="t">${title}</div>
+        ${sub ? `<div class="s">${sub}</div>` : ""}
+        ${pct != null ? `<div class="progress"><i style="width:${pct}%"></i></div>` : ""}
+      </div>
+    </div>
+  </button>`;
+}
+
+function catalogOpts(state) {
+  if (!state.previewCatalog) return linkOpts(state);
+  const conn = {};
+  PROVIDER_ORDER.forEach((p) => { conn[p] = true; });
+  return { conn, youtubeLogin: false };
+}
+
 function protoJumpBackIn(state) {
-  /* Resume rail is watch history — not “this service exists.” New users have none. */
-  if (!state.hasHistory) return "";
-  const linked = CONTINUE.filter((c) => state.conn[c.provider]);
+  /* Resume rail is watch history. New user has none, even when the rest of the catalog is previewed. */
+  if (state.hideContinue) return "";
+  if (!state.hasHistory && !state.previewCatalog) return "";
+  const linked = state.previewCatalog
+    ? CONTINUE
+    : CONTINUE.filter((c) => state.conn[c.provider]);
   if (!linked.length) return "";
   return `
     <div class="sec">
-      <div class="sec-head"><span class="sec-title big">Continue watching</span><span class="sec-more">See all</span></div>
-      <div class="rail">${linked.map((c) => `
-        <button class="d-chip" data-action="open-title" data-id="${c.id}" data-p="${c.provider}" type="button">
-          <div class="th">
-            <div class="art" style="${art(c.title)}"></div>
-            <span class="chip-badge">${pmark(c.provider, "sm")}</span>
-          </div>
-          <div class="txt"><div class="t">${c.title}</div><div class="s">${c.left}</div>
-            <div class="progress"><i style="width:${c.pct}%"></i></div></div>
-        </button>`).join("")}</div>
+      <div class="sec-head"><span class="sec-title big">Continue watching</span></div>
+      <div class="rail">${linked.map((c) => titleCard({
+        id: c.id, provider: c.provider, title: c.title, sub: c.left, pct: c.pct, kind: "cw",
+      })).join("")}</div>
     </div>`;
 }
 
 function protoGrid(state) {
   const sel = state.filter;
-  const opts = linkOpts(state);
+  const opts = catalogOpts(state);
   /* Only render titles for services we are actually in. Logged-out catalogs
      are not scrapable for Netflix / Prime / etc. */
   if (sel === "all") {
@@ -129,13 +159,9 @@ function protoGrid(state) {
     const mixed = linkedIds.flatMap((p) =>
       (TRENDING[p] || []).slice(0, per).map((t) => ({ t, p }))
     );
-    return `<div class="d-grid">${mixed.slice(0, 9).map((m) => {
-      return `<button class="poster p-wide" data-action="open-title" data-id="${m.t.id}" data-p="${m.p}" type="button" style="border:0;padding:0;text-align:left;cursor:pointer">
-        <div class="art" style="${art(m.t.title)}"></div>
-        <div class="art-title" style="font-size:10px;bottom:18%">${m.t.title}</div>
-        <span class="badge">${pmark(m.p)}</span>
-      </button>`;
-    }).join("")}</div>`;
+    return `<div class="d-grid">${mixed.slice(0, 9).map((m) => titleCard({
+      id: m.t.id, provider: m.p, title: m.t.title, sub: contentDuration(m.t.sub),
+    })).join("")}</div>`;
   }
   if (!isLinked(sel, opts)) {
     const p = PROVIDERS[sel];
@@ -144,15 +170,13 @@ function protoGrid(state) {
       <button class="btn primary sm" data-action="connect-service" data-p="${sel}" type="button">Sign in</button></div>`;
   }
   const items = (TRENDING[sel] || []).concat(TRENDING[sel] || []).slice(0, 9);
-  return `<div class="d-grid">${items.map((t) => `
-    <button class="poster p-wide" data-action="open-title" data-id="${t.id}" data-p="${sel}" type="button" style="border:0;padding:0;text-align:left;cursor:pointer">
-      <div class="art" style="${art(t.title)}"></div>
-      <div class="art-title" style="font-size:10px;bottom:18%">${t.title}</div>
-    </button>`).join("")}</div>`;
+  return `<div class="d-grid">${items.map((t) => titleCard({
+    id: t.id, provider: sel, title: t.title, sub: contentDuration(t.sub),
+  })).join("")}</div>`;
 }
 
 function protoTrending(state) {
-  const opts = linkOpts(state);
+  const opts = catalogOpts(state);
   const hasLinked = PROVIDER_ORDER.some((p) => isLinked(p, opts));
   if (!hasLinked) return "";
   return `<div class="sec d-trending">
@@ -164,20 +188,17 @@ function protoTrending(state) {
 
 function protoHome(state) {
   const opts = linkOpts(state);
-  const any = Object.values(state.conn).some(Boolean);
   const head = `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
     ${appHead("Home", state, opts)}`;
-
-  if (!any) {
-    return head
-      + `<div class="home-body"><div class="home-col">${protoConnectCard()}</div></div>`
-      + `<div class="spacer-nav"></div>`;
-  }
+  const showPremium = !state.isPremium && (state.previewCatalog || hasLoginAccount(state.conn, opts));
+  const catalog = protoJumpBackIn(state)
+    + protoTrending(state)
+    + (showPremium ? premiumBlock() : "");
 
   return head
     + `<div class="home-body">
         <div class="home-col party-col">${protoPartyCard(state)}</div>
-        <div class="home-col catalog-col">${protoJumpBackIn(state)}${protoTrending(state)}${state.isPremium || !hasLoginAccount(state.conn, opts) ? "" : premiumBlock()}</div>
+        <div class="home-col catalog-col">${catalog}</div>
       </div>`
     + `<div class="spacer-nav"></div>`;
 }
@@ -239,17 +260,8 @@ function playerOverlayHtml(state) {
 
 function protoApps(state) {
   const opts = Object.assign(linkOpts(state), { playing: state.party === "playing" });
-  const any = Object.values(state.conn).some(Boolean);
-  if (!any) {
-    return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-      ${appHead("Apps", state, opts)}
-      <div class="browse-empty">
-        <div class="browse-empty-card">
-          <p>Connect a service to browse its titles here. Home is “what to watch”; Apps is the service you’re in.</p>
-          <button class="btn ghost block" data-action="nav" data-tab="accounts" type="button">Add My Accounts</button>
-        </div>
-      </div>
-      <div class="spacer-nav"></div>`;
+  if (state.brandHome) {
+    return `<div class="apps-catalog connect-only">${protoConnectCard()}</div>`;
   }
   const pid = state.provider || PROVIDER_ORDER.find((p) => isLinked(p, opts)) || "youtube";
   const body = isLinked(pid, opts) ? webviewPage(pid) : webviewLogin(pid);
@@ -629,7 +641,7 @@ function protoOverlay(state) {
     quota: state.quota,
   };
   if (state.sheet === "switcher") {
-    return switcherSheet(state.provider, opts);
+    return switcherSheet(state.provider, Object.assign({}, opts, { filter: state.switcherFilter || "all" }));
   }
   if (state.sheet === "title" && state.focusItem) {
     return startPartySheet(state.focusItem, state.focusProvider, state);
@@ -819,12 +831,11 @@ const PAGE_SCENES = {
     { id: "full", label: "With accounts", hint: "You’re in a live party" },
     { id: "left", label: "Left · rejoin", hint: "You left — friends still watching" },
     { id: "home-none", label: "No party yet", hint: "Create a party + trending" },
-    { id: "empty", label: "New user", hint: "YouTube ready — no watch history" },
-    { id: "empty-connect", label: "New user · connect", hint: "Connect card only — nothing to resume" },
-    { id: "apps", label: "Browse", hint: "Service WebView — switch from logos above the dock" },
+    { id: "empty", label: "New user", hint: "Provider header like No party yet — no continue watching" },
+    { id: "empty-v1", label: "New user v1", hint: "Teleparty title · provider-cycle mark · no continue watching" },
+    { id: "apps", label: "Browse", hint: "Service WebView" },
     { id: "inbox", label: "Inbox", hint: "From the Home header — not a dock tab" },
     { id: "browse", label: "In-app browse", hint: "Same as Apps — the selected service" },
-    { id: "browse-empty", label: "Apps · empty", hint: "No accounts — Add My Accounts" },
     { id: "switcher", label: "Switch service", hint: "Netflix-style overlay over Home" },
     { id: "paywall", label: "Premium paywall", hint: "Crunchyroll as a free user" },
     { id: "paywall-quota", label: "Quota exhausted", hint: "No free parties left this week" },
@@ -862,7 +873,7 @@ const PAGE_SCENES = {
 };
 
 const PAGE_LEGEND = {
-  home: "Home is across services. The header is the current provider — tap it to switch. Browse has logos above the dock. Party is the circle on the right — that’s how you return to a live watch.",
+  home: "Home is across services. The header is the current provider — tap it to switch. Party is the circle on the right — that’s how you return to a live watch.",
   party: "The movie stays clear. Friends sit in a Telegram-style row under the player — never on the picture.",
   profile: "Profile is the person; Settings is the knobs. What’s New and Sign out → Get Started live here.",
   accounts: "Manage accounts links and unlinks. Sign out lives once, in the confirm sheet.",
@@ -899,6 +910,11 @@ function freshState() {
     paywallPid: null,
     paywallPeriod: "yearly",
     joinUrl: "",
+    brandHome: false,
+    previewCatalog: false,
+    switcherFilter: "all",
+    forceHeader: false,
+    hideContinue: false,
     _scenario: "full",
     device: "compact",
   };
@@ -922,6 +938,11 @@ function applyScenario(state, name) {
   state.paywallPid = null;
   state.paywallPeriod = "yearly";
   state.joinUrl = "";
+  state.brandHome = false;
+  state.previewCatalog = false;
+  state.switcherFilter = "all";
+  state.forceHeader = false;
+  state.hideContinue = false;
 
   const withAccounts = () => {
     state.conn = defaultConn("full");
@@ -933,11 +954,29 @@ function applyScenario(state, name) {
   };
 
   if (name === "empty" || name === "empty-connect") {
-    state.youtubeLogin = name === "empty-connect";
-    state.conn = defaultConn("empty", { youtubeLogin: state.youtubeLogin });
-    state.provider = state.youtubeLogin ? null : "youtube";
-    state.filter = state.youtubeLogin ? "netflix" : "all";
+    state.youtubeLogin = true;
+    state.conn = defaultConn("empty", { youtubeLogin: true });
+    state.provider = "crunchyroll";
+    state.forceHeader = true;
+    state.hideContinue = true;
+    state.filter = "all";
     state.party = "none";
+    state.hasHistory = false;
+    state.previewCatalog = true;
+    state.brandHome = false;
+    state.tab = "home";
+    return;
+  }
+  if (name === "empty-v1") {
+    state.youtubeLogin = true;
+    state.conn = defaultConn("empty", { youtubeLogin: true });
+    state.provider = null;
+    state.filter = "all";
+    state.party = "none";
+    state.hasHistory = false;
+    state.hideContinue = true;
+    state.previewCatalog = true;
+    state.brandHome = true;
     state.tab = "home";
     return;
   }
@@ -971,15 +1010,6 @@ function applyScenario(state, name) {
     state.party = "playing";
     state.tab = "inbox";
     state.unread = 3;
-    return;
-  }
-  if (name === "browse-empty") {
-    state.youtubeLogin = true;
-    state.conn = defaultConn("empty", { youtubeLogin: true });
-    state.provider = null;
-    state.filter = "netflix";
-    state.party = "none";
-    state.tab = "apps";
     return;
   }
   if (name === "switcher") {
@@ -1534,7 +1564,18 @@ function mountInteractive(root, options = {}) {
       render();
       return;
     }
-    if (action === "open-switcher") { state.sheet = "switcher"; render(); return; }
+    if (action === "open-switcher") {
+      state.sheet = "switcher";
+      state.switcherFilter = state.switcherFilter || "all";
+      render();
+      return;
+    }
+    if (action === "switcher-filter") {
+      state.switcherFilter = t.dataset.filter || "all";
+      state.sheet = "switcher";
+      render();
+      return;
+    }
     if (action === "open-accounts") {
       state.sheet = null;
       state.tab = "accounts";
