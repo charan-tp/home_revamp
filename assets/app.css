@@ -11,11 +11,7 @@ body {
   font-family: var(--font);
   background: #060607;
   color: var(--text);
-  padding: 40px 32px 80px;
-  background-image:
-    radial-gradient(900px 500px at 12% -8%, rgba(226, 62, 107, 0.10), transparent 60%),
-    radial-gradient(900px 500px at 88% 4%, rgba(123, 63, 212, 0.10), transparent 60%);
-  background-attachment: fixed;
+  padding: 24px 32px 80px;
 }
 
 a { color: inherit; }
@@ -1204,7 +1200,7 @@ a { color: inherit; }
   max-width: 1000px; width: 100%;
 }
 .proto-toolbar-top {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
 }
 .proto-fs-btn {
   flex: none; padding: 8px 14px; border-radius: var(--r-pill);

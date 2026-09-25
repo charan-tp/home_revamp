@@ -2,85 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="refresh" content="0; url=index.html">
 <title>Home · Teleparty revamp</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/tokens.css?v=nav40">
-<link rel="stylesheet" href="assets/app.css?v=nav40">
+<script>location.replace("index.html");</script>
 </head>
-<body>
-
-<div class="page-head">
-  <div class="eyebrow">Option D · Final</div>
-  <h1>Home + Apps</h1>
-  <p>Every Home state on this page. Snapshots first so you can compare them; the playground at the bottom is the live phone.</p>
-</div>
-
-<div class="crumbs">
-  <a class="crumb" href="index.html">Overview</a>
-  <a class="crumb active" href="concept-d.html">Home</a>
-  <a class="crumb" href="party.html">Party</a>
-  <a class="crumb" href="profile-settings.html">Profile</a>
-  <a class="crumb" href="manage-accounts.html">Accounts</a>
-  <a class="crumb" href="components.html">Components</a>
-  <a class="crumb explore" href="astryx.html">Astryx</a>
-</div>
-
-<div class="section-label">All states</div>
-<p class="section-lead">Click a phone to load it in the playground.</p>
-<div id="gallery"></div>
-
-<div class="section-label">Form factors</div>
-<p class="section-lead">Same Home on Phone, Foldable, iPad, and iPhone Duo. Titles stay 16:9 — extra width adds more cards, not taller ones.</p>
-<div id="devices"></div>
-
-<div class="section-label">Interactive</div>
-<p class="section-lead">One live wireframe. Toggle a state or device, then tap Now-on, Inbox, Apps, titles, and cam/mic inside the frame.</p>
-<div id="proto"></div>
-
-<div class="notes">
-  <h2>How Home holds together</h2>
-  <div class="note-grid">
-    <div class="note good">
-      <h4>Premium = gold theme, not pink on gold</h4>
-      <p>Toggle <b>Premium · gold bg</b> in the playground. Backdrop uses <code>ic_premium_bg</code>; CTAs shift gold. Free keeps magenta.</p>
-    </div>
-    <div class="note good">
-      <h4>Provider switcher, not a Home title</h4>
-      <p>Tap the header to open the service grid. Columns follow the sheet width — three on a phone, more on Foldable and iPad. Filter with <b>All</b>, <b>Free</b>, and <b>Premium</b>. A gold star marks premium. The current service has the pink ring.</p>
-    </div>
-    <div class="note good">
-      <h4>New user, and New user v1</h4>
-      <p>New user uses the same provider header as <b>No party yet</b> — icon, name, chevron — and skips <b>Continue watching</b>. Trending and Switch to Premium stay. The connect card is not on Home. <b>New user v1</b> titles the page Teleparty, also skips Continue watching, and that connect card lives centered on Browse.</p>
-    </div>
-    <div class="note good">
-      <h4>Browse is the service WebView</h4>
-      <p>No Teleparty hub, search, inbox, or Return card over the WebView. Home’s provider name (with ▾) still opens the service grid. The Party tab is how you go back to a live watch.</p>
-    </div>
-    <div class="note good">
-      <h4>Trending tabs</h4>
-      <p>Selecting a service slides the chip row so that tab sits on the left, like Apple’s category pills. Home has no bell — Inbox is not on this screen.</p>
-    </div>
-    <div class="note good">
-      <h4>Paywall, not a toast</h4>
-      <p>Crunchyroll / Paramount as a free user opens the Premium sheet. Quota exhausted uses “No free parties left this week.”</p>
-    </div>
-    <div class="note good">
-      <h4>Tiles never stretch</h4>
-      <p>Phone, Foldable, iPad, and iPhone Duo keep 16:9 title cards. Extra width adds more cards — never a percentage of the window.</p>
-    </div>
-  </div>
-</div>
-
-<script src="assets/app.js?v=nav40"></script>
-<script src="assets/proto.js?v=nav40"></script>
-<script>
-mountPage({
-  gallery: document.getElementById("gallery"),
-  devices: document.getElementById("devices"),
-  play: document.getElementById("proto"),
-  page: "home",
-});
-</script>
-</body>
+<body></body>
 </html>

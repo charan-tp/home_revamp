@@ -872,13 +872,6 @@ const PAGE_SCENES = {
   ],
 };
 
-const PAGE_LEGEND = {
-  home: "Home is across services. The header is the current provider — tap it to switch. Party is the circle on the right — that’s how you return to a live watch.",
-  party: "The movie stays clear. Friends sit in a Telegram-style row under the player — never on the picture.",
-  profile: "Profile is the person; Settings is the knobs. What’s New and Sign out → Get Started live here.",
-  accounts: "Manage accounts links and unlinks. Sign out lives once, in the confirm sheet.",
-};
-
 function freshState() {
   return {
     tab: "home",
@@ -1311,7 +1304,6 @@ function mountInteractive(root, options = {}) {
   stage.innerHTML = `
     <div class="proto-toolbar">
       <div class="proto-toolbar-top">
-        <span class="proto-hint">Interactive — tap inside the phone</span>
         <button type="button" class="proto-fs-btn" data-fs="1">Full screen</button>
       </div>
       ${sceneChipRows(scenes)}
@@ -1327,7 +1319,6 @@ function mountInteractive(root, options = {}) {
       </div>
     </div>
     <div class="proto-phone-wrap"></div>
-    <p class="proto-legend">${PAGE_LEGEND[page] || ""}</p>
   `;
   root.appendChild(stage);
   const wrap = stage.querySelector(".proto-phone-wrap");
@@ -2047,25 +2038,27 @@ function mountDeviceGallery(root) {
 
 function mountPage(opts) {
   const page = opts.page || "home";
-  mountGallery(opts.gallery, page);
+  if (opts.gallery) mountGallery(opts.gallery, page);
   if (opts.devices) mountDeviceGallery(opts.devices);
   const proto = mountInteractive(opts.play, { page, start: opts.start, isPremium: opts.isPremium });
   const pick = (card) => {
     proto.showScene(card.dataset.scene, card.dataset.premium === "1");
     opts.play.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  opts.gallery.addEventListener("click", (e) => {
-    const card = e.target.closest("[data-scene]");
-    if (!card || !opts.gallery.contains(card)) return;
-    pick(card);
-  });
-  opts.gallery.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    const card = e.target.closest("[data-scene]");
-    if (!card || !opts.gallery.contains(card)) return;
-    e.preventDefault();
-    pick(card);
-  });
+  if (opts.gallery) {
+    opts.gallery.addEventListener("click", (e) => {
+      const card = e.target.closest("[data-scene]");
+      if (!card || !opts.gallery.contains(card)) return;
+      pick(card);
+    });
+    opts.gallery.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const card = e.target.closest("[data-scene]");
+      if (!card || !opts.gallery.contains(card)) return;
+      e.preventDefault();
+      pick(card);
+    });
+  }
   if (opts.devices) {
     opts.devices.addEventListener("click", (e) => {
       const card = e.target.closest("[data-device]");

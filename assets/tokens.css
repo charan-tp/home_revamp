@@ -12,13 +12,12 @@
   --hairline: rgba(255, 255, 255, 0.08);
   --hairline-strong: rgba(255, 255, 255, 0.16);
 
-  /* Brand */
-  --brand-magenta: #e23e6b;
-  --brand-pink: #e7457c;
+  /* Brand — one magenta, one purple, one CTA. */
+  --brand-magenta: #e2416f;
+  --brand-pink: #e2416f;
   --brand-purple: #8b3fd4;
-  --brand-violet: #6c63ff;
-  --grad-brand: linear-gradient(135deg, #e23e6b 0%, #b03bb8 55%, #7b3fd4 100%);
-  --grad-brand-soft: linear-gradient(160deg, rgba(226, 62, 107, 0.55) 0%, rgba(123, 63, 212, 0.35) 60%, rgba(11, 11, 13, 0) 100%);
+  --grad-brand: linear-gradient(135deg, #e2416f 0%, #b03bb8 55%, #7b3fd4 100%);
+  --grad-brand-soft: linear-gradient(160deg, rgba(226, 65, 111, 0.55) 0%, rgba(123, 63, 212, 0.35) 60%, rgba(11, 11, 13, 0) 100%);
   --grad-cta: linear-gradient(90deg, #e2416f 0%, #b03bb8 100%);
 
   /* Premium */

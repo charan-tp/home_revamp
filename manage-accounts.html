@@ -5,20 +5,13 @@
 <title>Manage accounts · Teleparty revamp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/tokens.css?v=nav40">
-<link rel="stylesheet" href="assets/app.css?v=nav40">
+<link rel="stylesheet" href="assets/tokens.css?v=nav43">
+<link rel="stylesheet" href="assets/app.css?v=nav43">
 </head>
 <body>
 
-<div class="page-head">
-  <div class="eyebrow">Accounts</div>
-  <h1>Manage My Accounts</h1>
-  <p>Still under Profile — constellation hero, <b>+</b> to add, and <b>no repeated Sign out</b>. Snapshots of connected / empty / confirm, then a live phone.</p>
-</div>
-
 <div class="crumbs">
-  <a class="crumb" href="index.html">Overview</a>
-  <a class="crumb" href="concept-d.html">Home</a>
+  <a class="crumb" href="index.html">Home</a>
   <a class="crumb" href="party.html">Party</a>
   <a class="crumb" href="profile-settings.html">Profile</a>
   <a class="crumb active" href="manage-accounts.html">Accounts</a>
@@ -26,37 +19,12 @@
   <a class="crumb explore" href="astryx.html">Astryx</a>
 </div>
 
-<div class="section-label">All states</div>
-<p class="section-lead">Click a phone to load it in the playground.</p>
-<div id="gallery"></div>
-
-<div class="section-label">Interactive</div>
-<p class="section-lead">One live wireframe. Open a connected row for options; Sign out only appears in the confirm sheet.</p>
 <div id="proto"></div>
 
-<div class="notes">
-  <h2>Design rules</h2>
-  <div class="note-grid">
-    <div class="note good">
-      <h4>Two jobs, two surfaces</h4>
-      <p><b>Switch Services</b> (pill) picks what you're browsing. <b>Manage Accounts</b> links and unlinks. Same providers — different intent.</p>
-    </div>
-    <div class="note good">
-      <h4>No “Sign out” wallpaper</h4>
-      <p>Connected rows show a chevron only. The destructive verb appears once, in a confirm sheet — same cure as the old “Sign in” spam.</p>
-    </div>
-    <div class="note">
-      <h4>Nav</h4>
-      <p>Four tabs: Home · Party · Apps · You. From You, open Manage accounts in this prototype.</p>
-    </div>
-  </div>
-</div>
-
-<script src="assets/app.js?v=nav40"></script>
-<script src="assets/proto.js?v=nav40"></script>
+<script src="assets/app.js?v=nav43"></script>
+<script src="assets/proto.js?v=nav43"></script>
 <script>
 mountPage({
-  gallery: document.getElementById("gallery"),
   play: document.getElementById("proto"),
   page: "accounts",
 });
