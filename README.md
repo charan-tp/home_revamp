@@ -4,8 +4,6 @@ Open `index.html` over HTTP (the playground blocks `file://`).
 
 | File | |
 |---|---|
-| `index.html` | Home (default) |
+| `index.html` | Home (default). Profile is the dock tab on this phone. |
 | `party.html` | Party |
-| `profile-settings.html` | Profile & Settings |
-| `manage-accounts.html` | Manage accounts |
 | `components.html` | Tokens and components |

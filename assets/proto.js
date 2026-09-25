@@ -408,8 +408,6 @@ function protoProfile(state) {
           ${psRow({ icon: "↺", title: "Restore Subscription", action: "toast", msg: "Restore checked" })}
         </div></div>`;
 
-  const linked = Object.values(state.conn).filter(Boolean).length;
-
   return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
     <div class="ps-top"><h1>You</h1></div>
     <div class="ps-hero">
@@ -425,28 +423,15 @@ function protoProfile(state) {
         ${badge}
       </div>
     </div>
-    <div class="ps-sec"><div class="ps-sec-h">Account</div>
-      <div class="ps-card">
-        ${psRow({
-          icon: "◎",
-          title: "Manage my accounts",
-          sub: linked ? `${linked} services connected` : "No services connected yet",
-          action: "nav",
-          tab: "accounts",
-        })}
-      </div>
-    </div>
     ${subBlock}
-    <p class="ps-footnote">App preferences live under Settings</p>
+    ${profileSettingsBody(state)}
     <div class="spacer-nav"></div>`;
 }
 
-function protoSettings(state) {
+function profileSettingsBody(state) {
   const compat = !!state.maximizeCompatibility;
   const notif = state.notificationsEnabled !== false;
-  return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-    <div class="ps-top"><h1>Settings</h1></div>
-    <div class="ps-sec" style="margin-top:18px"><div class="ps-sec-h">Video</div>
+  return `<div class="ps-sec"><div class="ps-sec-h">Video</div>
       <div class="ps-card">
         <div class="ps-row" style="cursor:default">
           <span class="txt">
@@ -485,9 +470,11 @@ function protoSettings(state) {
         ${psRow({ icon: "🐛", title: "Streaming QA tests", action: "toast", msg: "QA tests (debug only)" })}
       </div>
     </div>
-    <button class="ps-signout" data-action="ask-signout-tp" type="button">Sign Out</button>
-    <p class="ps-footnote">Sign Out uses a danger gradient — not the primary CTA colour</p>
-    <div class="spacer-nav"></div>`;
+    <button class="ps-signout" data-action="ask-signout-tp" type="button">Sign Out</button>`;
+}
+
+function protoSettings(state) {
+  return protoProfile(state);
 }
 
 function partyPeopleBar(state, count) {
@@ -828,18 +815,17 @@ function protoToast(host, msg) {
 
 const PAGE_SCENES = {
   home: [
-    { id: "full", label: "With accounts", hint: "You’re in a live party" },
-    { id: "left", label: "Left · rejoin", hint: "You left — friends still watching" },
-    { id: "home-none", label: "No party yet", hint: "Create a party + trending" },
-    { id: "empty", label: "New user", hint: "Provider header like No party yet — no continue watching" },
-    { id: "empty-v1", label: "New user v1", hint: "Teleparty title · provider-cycle mark · no continue watching" },
-    { id: "apps", label: "Browse", hint: "Service WebView" },
-    { id: "inbox", label: "Inbox", hint: "From the Home header — not a dock tab" },
-    { id: "browse", label: "In-app browse", hint: "Same as Apps — the selected service" },
-    { id: "switcher", label: "Switch service", hint: "Netflix-style overlay over Home" },
-    { id: "paywall", label: "Premium paywall", hint: "Crunchyroll as a free user" },
-    { id: "paywall-quota", label: "Quota exhausted", hint: "No free parties left this week" },
-    { id: "netflix-reauth", label: "Netflix re-auth", hint: "Session expired mid-browse" },
+    { id: "full", label: "Live party", group: "Home" },
+    { id: "home-none", label: "No party yet", group: "Home" },
+    { id: "left", label: "Left · rejoin", group: "Home" },
+    { id: "empty", label: "New user", group: "Home" },
+    { id: "empty-v1", label: "New user v1", group: "Home" },
+    { id: "profile-tab", label: "Profile", group: "Home", tabOnly: "profile" },
+    { id: "apps", label: "Browse", group: "Browse" },
+    { id: "netflix-reauth", label: "Netflix re-auth", group: "Browse" },
+    { id: "switcher", label: "Switch service", group: "Sheets" },
+    { id: "paywall", label: "Premium paywall", group: "Sheets" },
+    { id: "paywall-quota", label: "Quota exhausted", group: "Sheets" },
   ],
   party: [
     { id: "party-live", label: "Live", hint: "Clean 16:9 · people + chat under" },
@@ -859,9 +845,8 @@ const PAGE_SCENES = {
     { id: "party-unsupported", label: "Unsupported", hint: "Service not on mobile yet" },
   ],
   profile: [
-    { id: "profile", label: "Profile", hint: "Identity + subscription" },
+    { id: "profile", label: "Profile", hint: "Identity, subscription, and preferences" },
     { id: "profile", label: "Profile · premium", hint: "Gold backdrop + gold chrome", premium: true, galleryOnly: true },
-    { id: "settings", label: "Settings", hint: "Preferences + Sign out" },
     { id: "whatsnew", label: "What’s New", hint: "Version bump interstitial" },
     { id: "signed-out", label: "Signed out", hint: "Back to Get Started" },
   ],
@@ -1152,7 +1137,7 @@ function applyScenario(state, name) {
   if (name === "whatsnew") {
     withAccounts();
     state.party = "none";
-    state.tab = "settings";
+    state.tab = "profile";
     state.sheet = "whatsnew";
     return;
   }
@@ -1193,7 +1178,7 @@ function applyScenario(state, name) {
   if (name === "settings") {
     withAccounts();
     state.party = "none";
-    state.tab = "settings";
+    state.tab = "profile";
     return;
   }
   withAccounts();
@@ -1253,6 +1238,23 @@ function protoPhoneHtml(state, extraClass = "") {
 }
 
 function sceneChipRows(scenes) {
+  const chip = (s) =>
+    `<button type="button" data-scenario="${s.id}"${s.tabOnly ? ` data-tab-only="${s.tabOnly}"` : ""} class="proto-chip">${s.label}</button>`;
+  if (scenes.some((s) => s.group)) {
+    const order = [];
+    const by = new Map();
+    scenes.forEach((s) => {
+      const g = s.group || "More";
+      if (!by.has(g)) {
+        by.set(g, []);
+        order.push(g);
+      }
+      by.get(g).push(s);
+    });
+    return order.map((g) =>
+      `<div class="proto-chip-row"><span class="proto-chip-label">${g}</span><div class="proto-chips">${by.get(g).map(chip).join("")}</div></div>`
+    ).join("");
+  }
   const n = scenes.length;
   const rows = n <= 6
     ? [scenes]
@@ -1263,9 +1265,7 @@ function sceneChipRows(scenes) {
           return [scenes.slice(0, size), scenes.slice(size, size * 2), scenes.slice(size * 2)];
         })();
   return rows.map((row) =>
-    `<div class="proto-chips">${row.map((s) =>
-      `<button type="button" data-scenario="${s.id}" class="proto-chip">${s.label}</button>`
-    ).join("")}</div>`
+    `<div class="proto-chips">${row.map(chip).join("")}</div>`
   ).join("");
 }
 
@@ -1420,7 +1420,11 @@ function mountInteractive(root, options = {}) {
   function render() {
     wrap.innerHTML = `<div class="proto-phone-sizer">${protoPhoneHtml(state)}</div>`;
     stage.querySelectorAll("[data-scenario]").forEach((c) => {
-      c.classList.toggle("on", c.dataset.scenario === state._scenario);
+      const viewingProfile = state.tab === "profile" || state.tab === "you" || state.tab === "settings";
+      const on = c.dataset.tabOnly
+        ? viewingProfile
+        : !viewingProfile && c.dataset.scenario === state._scenario;
+      c.classList.toggle("on", on);
     });
     stage.querySelectorAll("[data-tier]").forEach((c) => {
       const want = state.isPremium ? "premium" : "free";
@@ -1503,6 +1507,12 @@ function mountInteractive(root, options = {}) {
 
     const scenario = e.target.closest("[data-scenario]");
     if (scenario && stage.contains(scenario)) {
+      if (scenario.dataset.tabOnly) {
+        state.tab = scenario.dataset.tabOnly;
+        state.sheet = null;
+        render();
+        return;
+      }
       setScenario(scenario.dataset.scenario);
       return;
     }
