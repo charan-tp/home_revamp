@@ -824,8 +824,6 @@ const PAGE_SCENES = {
     { id: "apps", label: "Browse", group: "Browse" },
     { id: "netflix-reauth", label: "Netflix re-auth", group: "Browse" },
     { id: "switcher", label: "Switch service", group: "Sheets" },
-    { id: "paywall", label: "Premium paywall", group: "Sheets" },
-    { id: "paywall-quota", label: "Quota exhausted", group: "Sheets" },
   ],
   party: [
     { id: "party-live", label: "Live", hint: "Clean 16:9 · people + chat under" },
@@ -1777,16 +1775,6 @@ function mountInteractive(root, options = {}) {
       state.partyItem = null;
       state.playerOverlay = null;
       state.pendingSwitchPid = null;
-      if (PROVIDERS[pid].tier === "premium" && !state.isPremium) {
-        const left = state.quota[pid] || 0;
-        if (left <= 0) {
-          state.sheet = "paywall";
-          state.paywallSource = "quota";
-          state.paywallPid = pid;
-          render();
-          return;
-        }
-      }
       if (!state.conn[pid]) {
         state.conn[pid] = true;
         protoToast(stage, "Left party · opening " + PROVIDERS[pid].name + " sign-in");
@@ -1857,16 +1845,6 @@ function mountInteractive(root, options = {}) {
     }
     if (action === "pick-service") {
       const p = PROVIDERS[pid];
-      if (p.tier === "premium" && !state.isPremium) {
-        const left = state.quota[pid] || 0;
-        if (left <= 0) {
-          state.sheet = "paywall";
-          state.paywallSource = "quota";
-          state.paywallPid = pid;
-          render();
-          return;
-        }
-      }
       if (inLiveParty(state) && pid !== (state.partyProvider || state.provider)) {
         state.pendingSwitchPid = pid;
         state.sheet = "switch-warn";
@@ -1934,18 +1912,6 @@ function mountInteractive(root, options = {}) {
       if (state.role === "guest") {
         protoToast(stage, "Only the host can change the video");
         return;
-      }
-      const hostPid = state.focusProvider;
-      if (hostPid && PROVIDERS[hostPid].tier === "premium" && !state.isPremium) {
-        const left = state.quota[hostPid] || 0;
-        if (left <= 0) {
-          state.sheet = "paywall";
-          state.paywallSource = "quota";
-          state.paywallPid = hostPid;
-          render();
-          return;
-        }
-        state.quota[hostPid] = left - 1;
       }
       state.role = "host";
       state.party = "playing";

@@ -450,9 +450,9 @@ function switcherSheet(current, opts = {}) {
   return `<div class="scrim" data-action="close-sheet"></div>
     <div class="sheet sheet-profiles">
       <div class="picker-top">
-        <h2 class="picker-title">Teleparty</h2>
+        <h2 class="picker-title">Choose a service</h2>
+        <button class="picker-close" data-action="close-sheet" type="button" aria-label="Close">${ICONS.close}</button>
       </div>
-      <p class="picker-kicker">Choose a service</p>
       <div class="picker-filters" role="tablist">
         ${chip("all", "All")}
         ${chip("free", "Free")}
