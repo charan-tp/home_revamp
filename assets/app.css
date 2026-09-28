@@ -1,10 +1,5 @@
 /* Shared shell: page chrome, phone frames, and the components every concept reuses. */
 
-:root {
-  --tile-poster-w: 168px;
-  --tile-poster-h: 94px;
-}
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
 body {
@@ -50,16 +45,6 @@ a { color: inherit; }
 }
 
 /* ---------- Phone frames ---------- */
-
-.frames {
-  display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start;
-  max-width: 1180px; margin: 0 auto;
-}
-
-.frame-wrap { width: 360px; }
-.frame-caption { margin-top: 16px; }
-.frame-caption h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-.frame-caption p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 
 .phone {
   --frame-w: 390px;
@@ -171,30 +156,6 @@ a { color: inherit; }
 .ws-switch .pmark.round {
   width: 36px; height: 36px; font-size: 13px; border-radius: 50%; flex: none;
 }
-/* Provider-cycle mark: one logo at a time, 1.2s each, across every provider (12s loop). */
-.brand-lottie {
-  width: 36px; height: 36px; position: relative; flex: none;
-}
-.brand-lottie .brand-frame {
-  position: absolute; inset: 0;
-  display: grid; place-items: center;
-  opacity: 0; transform: scale(0.78);
-  animation: brandCycle 12s infinite;
-}
-.brand-lottie .pmark.round { margin: 0; }
-@keyframes brandCycle {
-  0% { opacity: 0; transform: scale(0.82); }
-  1.6% { opacity: 1; transform: scale(1); }
-  10% { opacity: 1; transform: scale(1); }
-  11.6% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 0; transform: scale(0.82); }
-}
-.ws-logo.plus {
-  width: 36px; height: 36px; border-radius: 50%; flex: none;
-  display: grid; place-items: center;
-  background: rgba(255, 255, 255, 0.14);
-  font-size: 20px; font-weight: 600; line-height: 1;
-}
 .ws-name {
   font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
@@ -204,27 +165,6 @@ a { color: inherit; }
   display: grid; place-items: center; color: #fff;
 }
 .ws-chev svg { display: block; width: 24px; height: 24px; }
-
-.now-chip, .service-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 32px; padding: 0 10px 0 6px; border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.14);
-  font-size: 12px; font-weight: 600; backdrop-filter: blur(12px);
-  color: inherit; font-family: var(--font); cursor: pointer;
-}
-.now-chip .pmark, .service-chip .pmark { width: 18px; height: 18px; font-size: 9px; }
-.now-chev { font-size: 9px; opacity: 0.55; line-height: 1; margin-left: -1px; }
-.inbox-btn {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff; display: grid; place-items: center; position: relative; cursor: pointer; padding: 0;
-}
-.inbox-btn .ico { width: 16px; height: 16px; opacity: 1; }
-.inbox-badge {
-  position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; padding: 0 4px;
-  border-radius: 999px; background: var(--grad-cta); color: #fff;
-  font-size: 9px; font-weight: 700; display: grid; place-items: center;
-}
 
 /* ---------- Provider mark ---------- */
 
@@ -243,25 +183,6 @@ a { color: inherit; }
 .pmark.face { width: 56px; height: 56px; font-size: 20px; border-radius: 14px; }
 .pmark.hero.plus, .pmark.face.plus {
   background: #2a2a2e !important; color: #fff; font-size: 32px; font-weight: 400;
-}
-/* Chrome marks: white mono so pill / FAB / browse match nav outlines */
-.pmark.mono {
-  background: transparent !important;
-  color: #fff;
-  box-shadow: none;
-}
-.service-chip .pmark.mono {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-.bservice .pmark.mono {
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-.fab .pmark.mono,
-.fab .tp-mark {
-  background: transparent !important;
-  color: #fff;
-  font-size: 15px;
-  width: 34px; height: 34px;
 }
 
 /* ---------- Section headers inside the app ---------- */
@@ -290,69 +211,6 @@ a { color: inherit; }
 }
 .rail::-webkit-scrollbar { display: none; }
 
-/* ---------- Posters ---------- */
-
-.poster {
-  position: relative; flex: none; border-radius: var(--r-sm); overflow: hidden;
-  background: var(--surface-2);
-  display: flex; align-items: flex-end;
-  width: var(--tile-poster-w);
-  height: var(--tile-poster-h);
-}
-.poster .art { position: absolute; inset: 0; }
-.poster .art::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.85) 100%);
-}
-.poster .art-title {
-  position: absolute; left: 0; right: 0; bottom: 34%; text-align: center;
-  font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.92); padding: 0 8px; line-height: 1.15;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
-}
-.poster .meta { position: relative; z-index: 2; padding: 10px; width: 100%; }
-.poster .meta .t { font-size: 12px; font-weight: 600; line-height: 1.3; }
-.poster .meta .s { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
-.poster .badge { position: absolute; top: 8px; left: 8px; z-index: 3; }
-
-.poster.p-wide { width: var(--tile-poster-w); height: var(--tile-poster-h); }
-.poster.p-hero { width: 100%; height: auto; aspect-ratio: 16 / 9; }
-
-/* Rank numeral for Top 10 treatments — set inside the tile so it never clips
-   against the rail's scroll box. */
-.rail.ranked { gap: 12px; align-items: stretch; }
-.rank-item { position: relative; flex: none; display: flex; }
-.rank {
-  position: absolute; left: 5px; bottom: -2px; z-index: 4;
-  font-size: 58px; font-weight: 800; line-height: 0.86; letter-spacing: -0.06em;
-  color: rgba(255, 255, 255, 0.06);
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85);
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
-  pointer-events: none;
-}
-
-/* ---------- Locked / connect overlay ---------- */
-
-.poster.locked .art { filter: saturate(0.35) brightness(0.5); }
-.poster.locked .art-title { opacity: 0.35; }
-.connect-tile {
-  flex: none; width: var(--tile-poster-w); height: var(--tile-poster-h); border-radius: var(--r-sm);
-  border: 1px dashed rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.03);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 8px; text-align: center; padding: 12px;
-}
-.connect-tile .cta { font-size: 11px; font-weight: 600; color: var(--brand-pink); }
-.connect-tile .sub { font-size: 10px; color: var(--text-tertiary); line-height: 1.4; }
-
-.lock-pill {
-  position: absolute; z-index: 4; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  display: inline-flex; align-items: center; gap: 5px;
-  max-width: 88px; text-align: center; line-height: 1.3;
-  padding: 5px 9px; border-radius: var(--r-md);
-  background: rgba(0, 0, 0, 0.72); border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 9.5px; font-weight: 600; backdrop-filter: blur(6px);
-}
-
 .d-grid {
   display: flex;
   gap: 10px;
@@ -363,11 +221,7 @@ a { color: inherit; }
   scrollbar-width: none;
 }
 .d-grid::-webkit-scrollbar { display: none; }
-.d-grid .poster,
-.d-grid .trend-card {
-  flex: none;
-}
-.d-grid .poster { width: var(--tile-poster-w); height: var(--tile-poster-h); }
+.d-grid .trend-card { flex: none; }
 .d-connect {
   margin: 10px 20px 0; padding: 12px 14px; border-radius: var(--r-md);
   background: rgba(255,255,255,.04); border: 1px solid var(--hairline);
@@ -698,7 +552,6 @@ a { color: inherit; }
   --brand-pink: #f5d547;
   --brand-magenta: #e0b84a;
   --brand-purple: #c9a227;
-  --shadow-fab: var(--shadow-fab-premium);
 }
 .phone.tier-premium .btn.primary {
   color: var(--text-on-premium);
@@ -710,23 +563,8 @@ a { color: inherit; }
   background: none;
   box-shadow: none;
 }
-.phone.tier-premium .now-chip.connect-chip,
-.phone.tier-premium .service-chip.connect-chip {
-  background: rgba(245, 213, 71, 0.16);
-  border-color: rgba(245, 213, 71, 0.45);
-}
-.phone.tier-premium .now-chip .plus,
-.phone.tier-premium .service-chip .plus {
-  background: var(--grad-premium-cta);
-  color: var(--text-on-premium);
-}
 .phone.tier-premium .progress > i {
   background: linear-gradient(90deg, #e0b84a, #f5d547);
-}
-.phone.tier-premium .acc-action.add {
-  background: rgba(245, 213, 71, 0.2);
-  border-color: rgba(245, 213, 71, 0.45);
-  color: var(--premium);
 }
 .phone.tier-premium .svc-empty-ico {
   background: var(--grad-premium-cta);
@@ -769,27 +607,12 @@ a { color: inherit; }
 .ptab.off { opacity: 0.62; }
 .ptab.off::after { content: "+"; font-size: 13px; color: var(--brand-pink); font-weight: 700; }
 
-/* ---------- Browse tab: Teleparty chrome ---------- */
-
-.bchrome { position: relative; z-index: 20; padding: 36px 0 10px; background: var(--bg); }
-.bchrome-row { display: flex; align-items: center; gap: 8px; padding: 0 12px 8px; }
-.bchrome-row h1 { font-size: 20px; font-weight: 600; }
 .iconbtn {
   width: 36px; height: 36px; border-radius: 50%; flex: none;
   background: rgba(255, 255, 255, 0.08); border: 1px solid var(--hairline);
   display: flex; align-items: center; justify-content: center; font-size: 15px;
   color: var(--text-secondary);
 }
-/* Non-editable service identity — intentionally NOT an address bar */
-.bservice {
-  flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
-  height: 40px; padding: 0 12px 0 8px; border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.05); border: 1px solid transparent;
-  pointer-events: none; /* never looks tappable / editable */
-}
-.bservice-txt { min-width: 0; }
-.bservice-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bservice-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
 
 /* ---------- Switch Services — Netflix profile-switch overlay ---------- */
 
@@ -971,21 +794,6 @@ a { color: inherit; }
 .svc-empty b { display: block; font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .svc-empty span { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
 
-.now-chip.connect-chip,
-.service-chip.connect-chip {
-  background: rgba(226, 62, 107, 0.18); border-color: rgba(226, 62, 107, 0.45);
-}
-.now-chip .plus,
-.service-chip .plus {
-  width: 18px; height: 18px; border-radius: 50%; display: inline-flex;
-  align-items: center; justify-content: center; font-size: 14px; font-weight: 600;
-  background: var(--grad-cta);
-}
-.fab.empty .tp-mark,
-.pmark.tp-mark {
-  background: transparent !important; color: #fff; font-size: 14px; font-weight: 800;
-  letter-spacing: -0.04em;
-}
 .svc-upsell {
   margin-top: 12px; padding: 12px 14px; border-radius: 12px;
   background: rgba(245, 213, 71, 0.1); border: 1px solid rgba(245, 213, 71, 0.35);
@@ -1063,23 +871,6 @@ a { color: inherit; }
 
 /* ---------- Docks, sheets, scrims ---------- */
 
-/* Sits clear of the 68px nav bar rather than on top of it. */
-.dock {
-  position: absolute; left: 14px; right: 14px; bottom: 86px; z-index: 28;
-  background: rgba(18, 18, 22, 0.72);
-  -webkit-backdrop-filter: blur(22px) saturate(1.6);
-  backdrop-filter: blur(22px) saturate(1.6);
-  border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 18px;
-  padding: 8px 10px; display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-}
-.dock-th { width: 40px; height: 40px; border-radius: 8px; overflow: hidden; position: relative; flex: none; }
-.dock-th .art { position: absolute; inset: 0; }
-.dock-avatars { flex: none; }
-.dock-txt { flex: 1; min-width: 0; }
-.dock-txt .t { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dock-txt .s { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
-
 .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 38; }
 .sheet {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -1148,43 +939,6 @@ a { color: inherit; }
 .av-pill.on { color: #8ee0a2; }
 .av-pill.off { color: #ff6b7a; }
 
-.tv-hero {
-  display: flex; align-items: center; gap: 12px;
-  background: var(--surface); border: 1px solid var(--hairline);
-  border-radius: var(--r-lg); padding: 12px; margin: 0 20px;
-}
-.tv-hero-mark {
-  width: 56px; height: 56px; border-radius: 14px;
-  display: grid; place-items: center; font-weight: 800; font-size: 18px; color: #fff; flex: none;
-}
-.tv-hero h3 { font-size: 16px; font-weight: 600; }
-.tv-hero p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-.tv-hero .btn { margin-left: auto; }
-.tv-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 12px 8px; padding: 0 16px 8px;
-}
-.tv-app {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  background: none; border: 0; color: inherit; padding: 0; cursor: pointer; font-family: var(--font);
-}
-.tv-tile {
-  width: 72px; height: 72px; border-radius: 18px;
-  display: grid; place-items: center; font-weight: 800; font-size: 20px; color: #fff;
-  position: relative; box-shadow: 0 8px 18px rgba(0,0,0,.28);
-}
-.tv-app.current .tv-tile { box-shadow: inset 0 0 0 2px #fff, 0 8px 18px rgba(0,0,0,.28); }
-.tv-nm { font-size: 10px; font-weight: 600; color: var(--text-secondary); max-width: 72px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
-.tv-app.add .tv-tile {
-  background: rgba(255,255,255,.06); color: var(--text-tertiary);
-  box-shadow: none; border: 1px dashed var(--hairline-strong); font-size: 28px; font-weight: 400;
-}
-.tv-tick {
-  position: absolute; top: 4px; right: 4px; width: 14px; height: 14px; border-radius: 50%;
-  background: #8ee0a2; color: #0b0b0d; font-size: 9px; font-weight: 800; display: grid; place-items: center;
-}
-
 .apps-catalog { position: relative; z-index: 10; padding-top: 28px; }
 .screen:has(.chrome-bar) {
   display: flex; flex-direction: column; overflow: hidden;
@@ -1222,16 +976,6 @@ a { color: inherit; }
 .wv.embedded { background: transparent; border-top: 0; padding-top: 0; }
 .wv.embedded .wv-cats { padding-top: 4px; }
 
-.mail-list { padding: 0 8px 8px; }
-.mail {
-  display: grid; grid-template-columns: 1fr auto; gap: 6px 10px;
-  width: 100%; padding: 12px 12px; border: 0; border-bottom: 1px solid var(--hairline);
-  background: none; color: inherit; text-align: left; font-family: var(--font); cursor: pointer;
-}
-.mail.unread .mail-t { font-weight: 700; }
-.mail-t { font-size: 13px; }
-.mail-b { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-.mail-when { font-size: 11px; color: var(--text-tertiary); }
 .row { display: flex; align-items: center; }
 .gap8 { gap: 8px; } .gap12 { gap: 12px; }
 .grow { flex: 1; }
@@ -1256,30 +1000,6 @@ a { color: inherit; }
 .note p { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
 .note.good { border-left: 3px solid var(--success); }
 .note.risk { border-left: 3px solid var(--live); }
-
-/* ---------- State gallery (static snapshots) ---------- */
-
-.state-gallery {
-  display: flex; flex-wrap: wrap; gap: 40px 36px;
-  max-width: 1240px; margin: 0 auto 12px;
-}
-.gallery-card {
-  width: 360px; background: none; border: 0; padding: 0;
-  text-align: left; color: inherit; font-family: var(--font); cursor: pointer;
-}
-.gallery-card .phone {
-  --frame-w: 360px;
-  --frame-h: 800px;
-  pointer-events: none;
-  transition: transform .18s, box-shadow .18s;
-}
-.gallery-card:hover .phone,
-.gallery-card:focus-visible .phone {
-  transform: translateY(-4px);
-  box-shadow: 0 34px 80px rgba(0, 0, 0, 0.72);
-}
-.gallery-card:focus-visible { outline: none; }
-.phone.snapshot .screen { overflow: hidden; }
 
 /* ---------- Interactive playground (one live phone) ---------- */
 
@@ -1418,90 +1138,7 @@ body.proto-fs-lock .proto-toast { z-index: 220; }
 }
 .proto-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-button.acc-card {
-  width: calc(100% - 40px); text-align: left; color: inherit; font-family: var(--font); cursor: pointer;
-}
-.acc-chev {
-  width: 28px; height: 28px; border-radius: 50%; flex: none;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; color: var(--text-tertiary); background: rgba(255,255,255,.06);
-}
-button.d-chip {
-  cursor: pointer; border: 1px solid var(--hairline); background: var(--surface);
-  color: inherit; font-family: var(--font);
-}
-.d-chip .th { position: relative; }
-.d-chip .chip-badge {
-  position: absolute; top: 3px; left: 3px; z-index: 2;
-  line-height: 0; filter: drop-shadow(0 1px 2px rgba(0,0,0,.55));
-}
-
-/* ---------- Manage accounts screen ---------- */
-
-.acc-top { position: relative; z-index: 10; padding: 40px 20px 0; }
-.acc-top .back {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,.08); border: 1px solid var(--hairline);
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 16px; color: var(--text-secondary); margin-bottom: 14px;
-  font-family: var(--font); cursor: pointer;
-}
-.acc-top h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
-.acc-top p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; max-width: 280px; }
-.acc-hero {
-  margin: 20px 20px 0; padding: 20px; border-radius: var(--r-lg);
-  background: linear-gradient(145deg, rgba(226,62,107,.22), rgba(123,63,212,.14) 55%, rgba(255,255,255,.03));
-  border: 1px solid var(--hairline); position: relative; z-index: 10; overflow: hidden;
-}
-.acc-hero.empty { background: rgba(255,255,255,.03); border-style: dashed; }
-.acc-hero .count { font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--text-secondary); font-weight: 600; margin-bottom: 8px; }
-.acc-hero h2 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
-.acc-hero .sub { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px; }
-.acc-orbit { display: flex; align-items: center; gap: 0; }
-.acc-orbit .orb {
-  width: 44px; height: 44px; border-radius: 14px; margin-left: -8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 800; color: #fff;
-  border: 2px solid var(--bg); box-shadow: 0 4px 12px rgba(0,0,0,.35);
-}
-.acc-orbit .orb:first-child { margin-left: 0; }
-.acc-orbit .more { margin-left: 10px; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-.acc-sec { margin-top: 22px; position: relative; z-index: 10; }
-.acc-sec-h {
-  padding: 0 20px; margin-bottom: 10px;
-  font-size: 12px; font-weight: 600; letter-spacing: .04em;
-  display: flex; align-items: center; gap: 8px;
-}
-.acc-sec-h.prem { color: var(--premium); }
-.acc-card {
-  margin: 0 20px 8px; padding: 12px 14px;
-  background: var(--surface); border: 1px solid var(--hairline);
-  border-radius: var(--r-md); display: flex; align-items: center; gap: 12px;
-}
-button.acc-card {
-  width: calc(100% - 40px); text-align: left; color: inherit; font-family: var(--font); cursor: pointer;
-}
-.acc-card.prem { border-color: rgba(245,213,71,.4); background: rgba(245,213,71,.06); }
-.acc-card .meta { flex: 1; min-width: 0; }
-.acc-card .meta .t { font-size: 14px; font-weight: 600; }
-.acc-card .meta .s { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
-.acc-card .meta .t .star { color: var(--premium); font-size: 11px; }
-.acc-action {
-  width: 36px; height: 36px; border-radius: 50%; flex: none;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 400;
-  background: rgba(255,255,255,.08); color: var(--text);
-  border: 1px solid var(--hairline);
-}
-.acc-action.add { background: rgba(226,62,107,.18); border-color: rgba(226,62,107,.35); color: #fff; }
-.acc-footnote {
-  margin: 20px 20px 0; padding: 14px; border-radius: var(--r-md);
-  background: rgba(255,255,255,.03); border: 1px solid var(--hairline);
-  font-size: 11px; color: var(--text-tertiary); line-height: 1.55; position: relative; z-index: 10;
-}
-
-/* ---------- Profile + Settings ---------- */
+/* ---------- Profile ---------- */
 
 .ps-top {
   position: relative; z-index: 10;
@@ -2125,8 +1762,6 @@ button.acc-card {
   min-width: 0;
 }
 .phone.device-expanded .app-head h1 { min-width: 0; }
-.phone.device-expanded .now-chip,
-.phone.device-expanded .service-chip { flex: none; max-width: 46%; }
 .phone.device-expanded .ws-name { max-width: 280px; }
 .phone.device-expanded .home-body {
   padding: 0 24px 28px;
@@ -2288,28 +1923,3 @@ button.acc-card {
   max-height: none;
 }
 
-.device-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 36px 28px;
-  max-width: 1240px;
-  margin: 0 auto 12px;
-  align-items: flex-start;
-}
-.device-gallery .frame-wrap {
-  width: auto;
-  overflow: hidden;
-}
-.device-gallery .phone { transform-origin: top left; }
-.device-gallery .phone.device-compact { transform: scale(0.92); }
-.device-gallery .gallery-card:hover .phone.device-compact { transform: scale(0.92) translateY(-4px); }
-.device-gallery .frame-wrap.device-compact { width: calc(390px * 0.92); height: calc(844px * 0.92 + 72px); }
-.device-gallery .phone.device-medium { transform: scale(0.72); }
-.device-gallery .phone.device-expanded { transform: scale(0.52); }
-.device-gallery .phone.device-dual { transform: scale(0.55); }
-.device-gallery .gallery-card:hover .phone.device-medium { transform: scale(0.72) translateY(-4px); }
-.device-gallery .gallery-card:hover .phone.device-expanded { transform: scale(0.52) translateY(-4px); }
-.device-gallery .gallery-card:hover .phone.device-dual { transform: scale(0.55) translateY(-4px); }
-.device-gallery .frame-wrap.device-medium { width: calc(680px * 0.72); height: calc(800px * 0.72 + 72px); }
-.device-gallery .frame-wrap.device-expanded { width: calc(1024px * 0.52); height: calc(768px * 0.52 + 72px); }
-.device-gallery .frame-wrap.device-dual { width: calc(764px * 0.55); height: calc(780px * 0.55 + 72px); }

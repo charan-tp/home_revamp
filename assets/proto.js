@@ -286,105 +286,6 @@ function protoApps(state) {
     ${withChrome(`<div class="apps-catalog">${wireCatalog(body, pid)}</div>`, providerTitleBar(pid))}`;
 }
 
-function protoInbox(state) {
-  const opts = linkOpts(state);
-  return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-    ${appHead("Inbox", state, opts)}
-    <div class="mail-list">${INBOX_ITEMS.map((m) => `
-      <button class="mail ${m.unread && state.unread ? "unread" : ""}" data-action="read-inbox" type="button">
-        <span><div class="mail-t">${m.title}</div><div class="mail-b">${m.body}</div></span>
-        <span class="mail-when">${m.when}</span>
-      </button>`).join("")}</div>
-    <div class="spacer-nav"></div>`;
-}
-
-function protoBrowse(state) {
-  return protoApps(state);
-}
-
-function protoAccounts(state) {
-  const opts = linkOpts(state);
-  const connected = PROVIDER_ORDER.filter((p) => isLinked(p, opts));
-  const freeAvail = FREE_PROVIDERS.filter((p) => !isLinked(p, opts));
-  const premAvail = PREMIUM_PROVIDERS.filter((p) => !isLinked(p, opts));
-
-  const card = (pid, kind) => {
-    const p = PROVIDERS[pid];
-    const premium = p.tier === "premium";
-    if (kind === "connected") {
-      if (isOpen(pid, linkOpts(state))) {
-        return `<button class="acc-card" data-action="browse-service" data-p="${pid}" type="button">
-          ${pmark(pid, "lg")}
-          <div class="meta">
-            <div class="t">${p.name}</div>
-            <div class="s">Ready to watch</div>
-          </div>
-          <span class="acc-chev">›</span>
-        </button>`;
-      }
-      return `<button class="acc-card ${premium ? "prem" : ""}" data-action="manage-service" data-p="${pid}" type="button">
-        ${pmark(pid, "lg")}
-        <div class="meta">
-          <div class="t">${p.name}${premium ? ' <span class="star">★</span>' : ""}</div>
-          <div class="s">Connected · tap for options</div>
-        </div>
-        <span class="acc-chev">›</span>
-      </button>`;
-    }
-    return `<button class="acc-card ${premium ? "prem" : ""}" data-action="connect-service" data-p="${pid}" type="button">
-      ${pmark(pid, "lg")}
-      <div class="meta">
-        <div class="t">${p.name}${premium ? ' <span class="star">★</span>' : ""}</div>
-        <div class="s">${premium ? "Premium host" : "Free to connect"}</div>
-      </div>
-      <span class="acc-action add">+</span>
-    </button>`;
-  };
-
-  const hero = connected.length === 0 ? `
-    <div class="acc-hero empty">
-      <div class="count">No accounts yet</div>
-      <h2>Connect a service to start watching</h2>
-      <div class="sub">You'll sign in on that provider's page. We never see your password.</div>
-      <button class="btn primary" data-action="open-switcher" type="button">Connect your first service</button>
-    </div>` : `
-    <div class="acc-hero">
-      <div class="count">${connected.length} connected</div>
-      <h2>Your services</h2>
-      <div class="sub">Tap a service to browse or remove it.</div>
-      <div class="acc-orbit">
-        ${connected.map((p) => `<span class="orb" style="background:${PROVIDERS[p].color}">${PROVIDERS[p].mark}</span>`).join("")}
-        <span class="more">Ready to party</span>
-      </div>
-    </div>`;
-
-  return `<div class="ambient ${state.isPremium ? "premium" : ""}" style="height:220px"></div>
-    <div class="acc-top">
-      <button class="back" data-action="nav" data-tab="profile" type="button">←</button>
-      <h1>Manage accounts</h1>
-      <p>Add or remove streaming services used by Teleparty.</p>
-    </div>
-    ${hero}
-    ${connected.length ? `<div class="acc-sec"><div class="acc-sec-h">My accounts</div>
-      ${connected.map((p) => card(p, "connected")).join("")}</div>` : ""}
-    ${premAvail.length ? `<div class="acc-sec"><div class="acc-sec-h prem">Premium services ★</div>
-      ${premAvail.map((p) => card(p, "add")).join("")}</div>` : ""}
-    ${freeAvail.length ? `<div class="acc-sec"><div class="acc-sec-h">Free services</div>
-      ${freeAvail.map((p) => card(p, "add")).join("")}</div>` : ""}
-    <div class="acc-footnote">Need more services? The browser extension already supports extras — Android is catching up.</div>
-    <div class="spacer-nav"></div>`;
-}
-
-function protoStub(title, body, cta, state = {}) {
-  return `<div class="ambient ${state.isPremium ? "premium" : ""}" style="height:160px"></div>
-    <div style="position:relative;z-index:10;padding:36px 20px 0">
-      <h1 style="font-size:24px;font-weight:600;margin-bottom:8px">${title}</h1>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.55;margin-bottom:18px">${body}</p>
-      ${cta || ""}
-    </div>
-    <div class="spacer-nav"></div>`;
-}
-
 function psRow(opts) {
   const {
     icon = "•", title, sub = "", action = "toast", msg = title, tab = "",
@@ -488,10 +389,6 @@ function profileSettingsBody(state) {
       </div>
     </div>
     <button class="ps-signout" data-action="ask-signout-tp" type="button">Sign Out</button>`;
-}
-
-function protoSettings(state) {
-  return protoProfile(state);
 }
 
 function partyPeopleBar(state, count) {
@@ -628,10 +525,7 @@ function protoParty(state) {
 function protoScreen(state) {
   if (state.tab === "auth") return protoAuth();
   if (state.tab === "apps" || state.tab === "browse") return protoApps(state);
-  if (state.tab === "inbox") return protoInbox(state);
-  if (state.tab === "accounts") return protoAccounts(state);
-  if (state.tab === "profile" || state.tab === "you") return protoProfile(state);
-  if (state.tab === "settings") return protoSettings(state);
+  if (state.tab === "profile") return protoProfile(state);
   if (state.tab === "party") return protoParty(state);
   return protoHome(state);
 }
@@ -642,7 +536,6 @@ function protoOverlay(state) {
     isPremium: state.isPremium,
     youtubeLogin: !!state.youtubeLogin,
     empty: !Object.values(state.conn).some(Boolean),
-    quota: state.quota,
   };
   if (state.sheet === "switcher") {
     return switcherSheet(state.provider, Object.assign({}, opts, {
@@ -655,24 +548,6 @@ function protoOverlay(state) {
   }
   if (state.sheet === "paywall") {
     return paywallSheet(state);
-  }
-  if (state.sheet === "signout" && state.signOutPid) {
-    return confirmSignOutSheet(state.signOutPid);
-  }
-  if (state.sheet === "manage" && state.managePid) {
-    const p = PROVIDERS[state.managePid];
-    return `<div class="scrim" data-action="close-sheet"></div>
-      <div class="sheet">
-        <div class="sheet-grab"></div>
-        <div class="row gap12" style="margin-bottom:14px">${pmark(state.managePid, "lg")}
-          <div><div class="sheet-t">${p.name}</div>
-            <div class="tiny dim" style="margin-top:4px">Connected</div></div></div>
-        <div class="sheet-actions">
-          <button class="btn primary block" data-action="browse-service" data-p="${state.managePid}" type="button">Browse ${p.name}</button>
-          ${isOpen(state.managePid, linkOpts(state)) ? "" : `<button class="btn ghost block" data-action="ask-signout" data-p="${state.managePid}" type="button">Sign out…</button>`}
-          <button class="btn ghost block" data-action="close-sheet" type="button">Cancel</button>
-        </div>
-      </div>`;
   }
   if (state.sheet === "leave") {
     return `<div class="scrim" data-action="close-sheet"></div>
@@ -861,17 +736,6 @@ const PAGE_SCENES = {
     { id: "party-invite", label: "Invite", hint: "Copy / share the join link" },
     { id: "party-unsupported", label: "Unsupported", hint: "Service not on mobile yet" },
   ],
-  profile: [
-    { id: "profile", label: "Profile", hint: "Identity, subscription, and preferences" },
-    { id: "profile", label: "Profile · premium", hint: "Gold backdrop + gold chrome", premium: true, galleryOnly: true },
-    { id: "whatsnew", label: "What’s New", hint: "Version bump interstitial" },
-    { id: "signed-out", label: "Signed out", hint: "Back to Get Started" },
-  ],
-  accounts: [
-    { id: "accounts", label: "Connected", hint: "Chevron → options" },
-    { id: "accounts-empty", label: "None yet", hint: "Connect your first service" },
-    { id: "signout", label: "Sign out", hint: "Confirm sheet" },
-  ],
 };
 
 function freshState() {
@@ -882,8 +746,6 @@ function freshState() {
     sheet: null,
     focusItem: null,
     focusProvider: null,
-    signOutPid: null,
-    managePid: null,
     isPremium: false,
     party: "playing",
     partyItem: TRENDING.netflix[0],
@@ -896,20 +758,15 @@ function freshState() {
     playerOverlay: null,
     pendingSwitchPid: null,
     disconnectMsg: null,
-    quota: { crunchyroll: 1, paramount: 1 },
     role: "host",
-    unread: 3,
     youCam: true,
     youMic: true,
-    paywallSource: null,
-    paywallPid: null,
     paywallPeriod: "yearly",
     joinUrl: "",
     brandHome: false,
     previewCatalog: false,
     switcherFilter: "all",
     switcherLayout: "grid",
-    forceHeader: false,
     hideContinue: false,
     announcement: null,
     _scenario: "full",
@@ -922,24 +779,18 @@ function applyScenario(state, name) {
   state.sheet = null;
   state.focusItem = null;
   state.focusProvider = null;
-  state.signOutPid = null;
-  state.managePid = null;
   state.youtubeLogin = false;
   state.hasHistory = false;
   state.playerOverlay = null;
   state.pendingSwitchPid = null;
   state.disconnectMsg = null;
-  state.quota = { crunchyroll: 1, paramount: 1 };
   state.role = "host";
-  state.paywallSource = null;
-  state.paywallPid = null;
   state.paywallPeriod = "yearly";
   state.joinUrl = "";
   state.brandHome = false;
   state.previewCatalog = false;
   state.switcherFilter = "all";
   state.switcherLayout = "grid";
-  state.forceHeader = false;
   state.hideContinue = false;
   state.announcement = null;
 
@@ -952,11 +803,10 @@ function applyScenario(state, name) {
     state.hasHistory = true;
   };
 
-  if (name === "empty" || name === "empty-connect" || name === "empty-v1") {
+  if (name === "empty") {
     state.youtubeLogin = true;
     state.conn = defaultConn("empty", { youtubeLogin: true });
     state.provider = null;
-    state.forceHeader = false;
     state.hideContinue = true;
     state.filter = "all";
     state.party = "none";
@@ -988,24 +838,10 @@ function applyScenario(state, name) {
     state.tab = "home";
     return;
   }
-  if (name === "browse") {
-    withAccounts();
-    state.party = "playing";
-    state.tab = "browse";
-    state.provider = "netflix";
-    return;
-  }
   if (name === "apps") {
     withAccounts();
     state.party = "playing";
     state.tab = "apps";
-    return;
-  }
-  if (name === "inbox") {
-    withAccounts();
-    state.party = "playing";
-    state.tab = "inbox";
-    state.unread = 3;
     return;
   }
   if (name === "switcher") {
@@ -1125,78 +961,12 @@ function applyScenario(state, name) {
     state.sheet = "join";
     return;
   }
-  if (name === "paywall") {
-    withAccounts();
-    state.party = "none";
-    state.tab = "home";
-    state.sheet = "paywall";
-    state.paywallSource = "provider";
-    state.paywallPid = "crunchyroll";
-    return;
-  }
-  if (name === "paywall-quota") {
-    withAccounts();
-    state.quota = { crunchyroll: 0, paramount: 0 };
-    state.party = "none";
-    state.tab = "home";
-    state.sheet = "paywall";
-    state.paywallSource = "quota";
-    state.paywallPid = "crunchyroll";
-    return;
-  }
   if (name === "netflix-reauth") {
     withAccounts();
     state.party = "playing";
     state.tab = "browse";
     state.provider = "netflix";
     state.sheet = "netflix-confirm";
-    return;
-  }
-  if (name === "whatsnew") {
-    withAccounts();
-    state.party = "none";
-    state.tab = "profile";
-    state.sheet = "whatsnew";
-    return;
-  }
-  if (name === "signed-out") {
-    state.tab = "auth";
-    state.party = "none";
-    state.conn = defaultConn("empty", { youtubeLogin: true });
-    return;
-  }
-  if (name === "accounts") {
-    withAccounts();
-    state.party = "none";
-    state.tab = "accounts";
-    return;
-  }
-  if (name === "accounts-empty") {
-    state.youtubeLogin = true;
-    state.conn = defaultConn("empty", { youtubeLogin: true });
-    state.provider = null;
-    state.party = "none";
-    state.tab = "accounts";
-    return;
-  }
-  if (name === "signout") {
-    withAccounts();
-    state.party = "none";
-    state.tab = "accounts";
-    state.signOutPid = "netflix";
-    state.sheet = "signout";
-    return;
-  }
-  if (name === "profile") {
-    withAccounts();
-    state.party = "none";
-    state.tab = "profile";
-    return;
-  }
-  if (name === "settings") {
-    withAccounts();
-    state.party = "none";
-    state.tab = "profile";
     return;
   }
   withAccounts();
@@ -1207,12 +977,8 @@ function applyScenario(state, name) {
 function protoNav(state) {
   if (state.tab === "auth") return "";
   return nav(state.tab, null, {
-    conn: state.conn,
-    youtubeLogin: !!state.youtubeLogin,
     partyBadge: state.party === "playing" || state.party === "idle" || state.party === "left",
-    inboxBadge: !!state.unread,
     live: state.tab === "party" && (state.party === "playing" || state.party === "idle"),
-    provider: state.provider,
   });
 }
 
@@ -1257,7 +1023,7 @@ function protoPhoneHtml(state, extraClass = "") {
 
 function sceneChipRows(scenes) {
   const chip = (s) =>
-    `<button type="button" data-scenario="${s.id}"${s.tabOnly ? ` data-tab-only="${s.tabOnly}"` : ""} class="proto-chip">${s.label}</button>`;
+    `<button type="button" data-scenario="${s.id}" class="proto-chip">${s.label}</button>`;
   if (scenes.some((s) => s.group)) {
     const order = [];
     const by = new Map();
@@ -1288,30 +1054,12 @@ function sceneChipRows(scenes) {
 }
 
 function inferPage(options = {}) {
-  if (options.page) return options.page;
-  if (options.tab === "party") return "party";
-  if (options.tab === "profile" || options.tab === "settings" || options.tab === "you") return "profile";
-  if (options.tab === "accounts") return "accounts";
-  return "home";
-}
-
-function mountGallery(root, page) {
-  const scenes = PAGE_SCENES[page] || [];
-  root.className = "state-gallery";
-  root.innerHTML = scenes.map((scene) => {
-    const state = freshState();
-    applyScenario(state, scene.id);
-    state.isPremium = !!scene.premium;
-    return `<div class="frame-wrap gallery-card" data-scene="${scene.id}" data-premium="${scene.premium ? "1" : "0"}" tabindex="0" role="button">
-      ${protoPhoneHtml(state, "snapshot")}
-      <div class="frame-caption"><h3>${scene.label}</h3><p>${scene.hint}</p></div>
-    </div>`;
-  }).join("");
+  return options.page || "home";
 }
 
 function mountInteractive(root, options = {}) {
   const page = inferPage(options);
-  const scenes = (PAGE_SCENES[page] || []).filter((s) => !s.galleryOnly);
+  const scenes = PAGE_SCENES[page] || [];
   const start = options.start || scenes[0]?.id || "full";
   const state = freshState();
   applyScenario(state, start);
@@ -1438,10 +1186,7 @@ function mountInteractive(root, options = {}) {
   function render() {
     wrap.innerHTML = `<div class="proto-phone-sizer">${protoPhoneHtml(state)}</div>`;
     stage.querySelectorAll("[data-scenario]").forEach((c) => {
-      const viewingProfile = state.tab === "profile" || state.tab === "you" || state.tab === "settings";
-      const on = c.dataset.tabOnly
-        ? viewingProfile
-        : !viewingProfile && c.dataset.scenario === state._scenario;
+      const on = state.tab !== "profile" && c.dataset.scenario === state._scenario;
       c.classList.toggle("on", on);
     });
     stage.querySelectorAll("[data-tier]").forEach((c) => {
@@ -1476,15 +1221,6 @@ function mountInteractive(root, options = {}) {
     const keepDevice = state.device || "compact";
     applyScenario(state, name);
     state.isPremium = keepPremium;
-    state.device = keepDevice;
-    render();
-  }
-
-  function showScene(name, premium) {
-    clearTimeout(stage._loadT);
-    const keepDevice = state.device || "compact";
-    applyScenario(state, name);
-    state.isPremium = !!premium;
     state.device = keepDevice;
     render();
   }
@@ -1540,12 +1276,6 @@ function mountInteractive(root, options = {}) {
 
     const scenario = e.target.closest("[data-scenario]");
     if (scenario && stage.contains(scenario)) {
-      if (scenario.dataset.tabOnly) {
-        state.tab = scenario.dataset.tabOnly;
-        state.sheet = null;
-        render();
-        return;
-      }
       setScenario(scenario.dataset.scenario);
       return;
     }
@@ -1616,16 +1346,8 @@ function mountInteractive(root, options = {}) {
       render();
       return;
     }
-    if (action === "open-accounts") {
-      state.sheet = null;
-      state.tab = "accounts";
-      render();
-      return;
-    }
     if (action === "open-paywall") {
       state.sheet = "paywall";
-      state.paywallSource = "provider";
-      state.paywallPid = state.paywallPid || "crunchyroll";
       render();
       return;
     }
@@ -1688,18 +1410,6 @@ function mountInteractive(root, options = {}) {
       }
       protoToast(stage, "Joined as guest");
       render();
-      return;
-    }
-    if (action === "video-chat") {
-      if (!state.isPremium) {
-        state.sheet = "paywall";
-        state.paywallSource = "provider";
-        state.paywallPid = "crunchyroll";
-        protoToast(stage, "Video chat is a Premium feature");
-        render();
-        return;
-      }
-      protoToast(stage, "Video chat");
       return;
     }
     if (action === "open-whatsnew") {
@@ -1855,17 +1565,6 @@ function mountInteractive(root, options = {}) {
     if (action === "nav") {
       state.tab = t.dataset.tab === "you" ? "profile" : t.dataset.tab;
       state.sheet = null;
-      if (t.dataset.tab === "inbox") state.unread = 0;
-      render();
-      return;
-    }
-    if (action === "fab" || action === "open-browse") {
-      if (!Object.values(state.conn).some(Boolean)) {
-        state.sheet = "switcher";
-      } else {
-        state.tab = "browse";
-        state.sheet = null;
-      }
       render();
       return;
     }
@@ -1876,11 +1575,6 @@ function mountInteractive(root, options = {}) {
     }
     if (action === "toggle-mic") {
       state.youMic = !state.youMic;
-      render();
-      return;
-    }
-    if (action === "read-inbox") {
-      state.unread = 0;
       render();
       return;
     }
@@ -1980,119 +1674,13 @@ function mountInteractive(root, options = {}) {
       render();
       return;
     }
-    if (action === "manage-service") {
-      state.managePid = pid;
-      state.sheet = "manage";
-      render();
-      return;
-    }
-    if (action === "ask-signout") {
-      if (isOpen(pid, linkOpts(state))) {
-        protoToast(stage, "YouTube doesn’t use an account");
-        return;
-      }
-      state.signOutPid = pid;
-      state.sheet = "signout";
-      render();
-      return;
-    }
-    if (action === "confirm-signout") {
-      if (isOpen(pid, linkOpts(state))) {
-        state.sheet = null;
-        protoToast(stage, "YouTube doesn’t use an account");
-        render();
-        return;
-      }
-      state.conn[pid] = false;
-      if (state.provider === pid) {
-        const next = PROVIDER_ORDER.find((p) => state.conn[p]);
-        state.provider = next || null;
-      }
-      state.sheet = null;
-      state.signOutPid = null;
-      protoToast(stage, "Signed out of " + PROVIDERS[pid].name);
-      render();
-      return;
-    }
-    if (action === "browse-service") {
-      if (inLiveParty(state) && pid !== (state.partyProvider || state.provider)) {
-        state.pendingSwitchPid = pid;
-        state.sheet = "switch-warn";
-        render();
-        return;
-      }
-      state.provider = pid;
-      state.tab = "browse";
-      state.sheet = null;
-      render();
-      return;
-    }
   });
 
   render();
-  return { state, render, setScenario, showScene };
-}
-
-function mountDeviceGallery(root) {
-  if (!root) return;
-  const devices = [
-    { id: "compact", label: "Phone", hint: "Compact · bottom bar. Titles stay 16:9." },
-    { id: "medium", label: "Foldable", hint: "Cover / fold outer · more columns, same tile size." },
-    { id: "expanded", label: "iPad", hint: "Nav rail · party + catalog side by side." },
-    { id: "dual", label: "iPhone Duo", hint: "Two phones + hinge. Home on the left, Party/Apps on the right." },
-  ];
-  root.className = "device-gallery";
-  root.innerHTML = devices.map((d) => {
-    const state = freshState();
-    applyScenario(state, "full");
-    state.device = d.id;
-    return `<div class="frame-wrap gallery-card device-${d.id}" data-device="${d.id}" tabindex="0" role="button">
-      ${protoPhoneHtml(state, "snapshot")}
-      <div class="frame-caption"><h3>${d.label}</h3><p>${d.hint}</p></div>
-    </div>`;
-  }).join("");
+  return { state, render, setScenario };
 }
 
 function mountPage(opts) {
   const page = opts.page || "home";
-  if (opts.gallery) mountGallery(opts.gallery, page);
-  if (opts.devices) mountDeviceGallery(opts.devices);
-  const proto = mountInteractive(opts.play, { page, start: opts.start, isPremium: opts.isPremium });
-  const pick = (card) => {
-    proto.showScene(card.dataset.scene, card.dataset.premium === "1");
-    opts.play.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-  if (opts.gallery) {
-    opts.gallery.addEventListener("click", (e) => {
-      const card = e.target.closest("[data-scene]");
-      if (!card || !opts.gallery.contains(card)) return;
-      pick(card);
-    });
-    opts.gallery.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      const card = e.target.closest("[data-scene]");
-      if (!card || !opts.gallery.contains(card)) return;
-      e.preventDefault();
-      pick(card);
-    });
-  }
-  if (opts.devices) {
-    opts.devices.addEventListener("click", (e) => {
-      const card = e.target.closest("[data-device]");
-      if (!card || !opts.devices.contains(card)) return;
-      proto.state.device = card.dataset.device;
-      proto.render();
-      opts.play.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    opts.devices.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      const card = e.target.closest("[data-device]");
-      if (!card || !opts.devices.contains(card)) return;
-      e.preventDefault();
-      proto.state.device = card.dataset.device;
-      proto.render();
-      opts.play.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
-  return proto;
+  return mountInteractive(opts.play, { page, start: opts.start, isPremium: opts.isPremium });
 }

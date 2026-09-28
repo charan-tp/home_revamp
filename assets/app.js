@@ -156,30 +156,6 @@ function pmark(provider, cls = "") {
   return `<span class="pmark ${cls}" ${style}>${p.mark}</span>`;
 }
 
-/* shape: "wide" (16:9 titles) | "hero". Portrait "tall" is unused — movies are landscape. */
-function poster(item, provider, shape = "wide", opts = {}) {
-  const p = PROVIDERS[provider];
-  const locked = opts.locked || !p.connected;
-  return `
-    <div class="poster p-${shape} ${locked ? "locked" : ""}" data-content-id="${item.id}">
-      <div class="art" style="${art(item.title, provider)}"></div>
-      <div class="art-title">${item.title}</div>
-      ${opts.badge !== false ? `<span class="badge">${pmark(provider)}</span>` : ""}
-      ${locked ? `<span class="lock-pill">🔒 Connect ${p.name}</span>` : ""}
-      ${opts.meta === false ? "" : `<div class="meta"><div class="t">${item.title}</div><div class="s">${item.sub || ""}</div></div>`}
-    </div>`;
-}
-
-function connectTile(provider) {
-  const p = PROVIDERS[provider];
-  return `
-    <div class="connect-tile">
-      ${pmark(provider, "lg")}
-      <div class="cta">Connect ${p.name}</div>
-      <div class="sub">See what's trending and host parties</div>
-    </div>`;
-}
-
 function avatars(count, size) {
   const shown = MEMBERS.slice(0, Math.min(count, 3));
   const extra = count - shown.length;
@@ -193,10 +169,7 @@ const ICONS = {
   home: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.2 12 3l9 7.2V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>`,
   party: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="9" r="2.4"/><circle cx="16" cy="9" r="2.4"/><path d="M4.5 18c.6-2.4 2.6-4 5.5-4s4.9 1.6 5.5 4"/><path d="M14 14.2c1.2-.7 2.7-1 4.2-.7 2 .5 3.4 1.9 3.8 3.5"/></svg>`,
   apps: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="6" height="6" rx="1.4"/><rect x="14" y="4" width="6" height="6" rx="1.4"/><rect x="4" y="14" width="6" height="6" rx="1.4"/><rect x="14" y="14" width="6" height="6" rx="1.4"/></svg>`,
-  inbox: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
-  search: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.2"/><path d="M16 16.5 20.2 20.5"/></svg>`,
   send: `<svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M3.2 20.8 21 12 3.2 3.2v6.7L14.4 12 3.2 14.1z"/></svg>`,
-  you: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="13.2" rx="6.8" ry="7.4"/><path d="M8.2 6.8 6.4 3.4M15.8 6.8l1.8-3.4"/><circle cx="9.6" cy="12.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="14.4" cy="12.2" r="1.15" fill="currentColor" stroke="none"/><path d="M10.2 16.4c.55.55 1.2.85 1.8.85s1.25-.3 1.8-.85"/></svg>`,
   cam: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10.5 21 8v8l-5-2.5z"/></svg>`,
   camOff: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h10v10H3zM16 10.5 21 8v8l-5-2.5zM3 3l18 18"/></svg>`,
   mic: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg>`,
@@ -205,15 +178,6 @@ const ICONS = {
 ICONS.profile = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.2"/><path d="M5.4 19c1.15-3.15 3.4-4.75 6.6-4.75S18.45 15.85 19.6 19"/></svg>`;
 ICONS.invite = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.1 2.8-4.7 5.5-4.7s4.8 1.6 5.5 4.7"/><path d="M17 7.5v6M14 10.5h6"/></svg>`;
 ICONS.close = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>`;
-ICONS.settings = ICONS.you;
-
-const INBOX_ITEMS = [
-  { id: "inv", unread: true, title: "Priya invited you", body: "Join Aarav’s party on Crunchyroll", when: "2m" },
-  { id: "watch", unread: true, title: "Kabir started watching", body: "Solo Leveling · Crunchyroll", when: "18m" },
-  { id: "nf", unread: true, title: "Netflix session expired", body: "Reconnect to keep hosting parties", when: "1h" },
-  { id: "quota", unread: false, title: "1 free Crunchyroll party left", body: "Resets Monday", when: "1d" },
-];
-
 const HUDDLE = [
   { n: "You", c: "#e2416f", cam: true, mic: true },
   { n: "Priya", c: "#7b3fd4", cam: true, mic: false },
@@ -301,53 +265,6 @@ function webviewLogin(pid) {
     </div>`;
 }
 
-/* Browse chrome — deliberately NOT an address bar. Service identity + back only.
-   Switching services is done via the Now-on chip or the Apps tab. */
-function browseChrome(pid) {
-  const p = PROVIDERS[pid];
-  return `<div class="bchrome">
-    <div class="bchrome-row">
-      <span class="iconbtn" title="Back in provider">←</span>
-      <div class="bservice">
-        ${pmark(pid, "mono")}
-        <div class="bservice-txt">
-          <div class="bservice-name">${p.name}</div>
-          <div class="bservice-sub">Browsing · not editable</div>
-        </div>
-      </div>
-      <span class="iconbtn" title="More">⋮</span>
-    </div>
-  </div>`;
-}
-
-function dock(kind, opts = {}) {
-  if (kind === "picking") {
-    return `<div class="dock">
-      <span class="dock-avatars">${avatars(opts.people || 5)}</span>
-      <div class="dock-txt"><div class="t">Choosing for ${opts.people || 5} people</div>
-        <div class="s">Pick a title to start</div></div>
-      <button class="btn ghost sm" data-action="nav" data-tab="party" type="button">Back</button>
-    </div>`;
-  }
-  if (kind === "return") {
-    return `<div class="dock">
-      <div class="dock-th"><div class="art" style="${art(opts.title)}"></div></div>
-      <div class="dock-txt"><div class="t">${opts.title}</div>
-        <div class="s"><span class="live-dot" style="display:inline-block;vertical-align:middle;margin-right:5px"></span>${opts.people || 5} watching · you’re in</div></div>
-      <button class="btn primary sm" data-action="nav" data-tab="party" type="button">Return</button>
-    </div>`;
-  }
-  if (kind === "rejoin") {
-    return `<div class="dock">
-      <div class="dock-th"><div class="art" style="${art(opts.title)}"></div></div>
-      <div class="dock-txt"><div class="t">${opts.title}</div>
-        <div class="s"><span class="live-dot" style="display:inline-block;vertical-align:middle;margin-right:5px"></span>${opts.people || 4} still watching</div></div>
-      <button class="btn primary sm" data-action="rejoin-party" type="button">Rejoin</button>
-    </div>`;
-  }
-  return "";
-}
-
 function startPartySheet(item, pid, state = {}) {
   const guest = state.role === "guest";
   return `<div class="scrim" data-action="close-sheet"></div>
@@ -373,15 +290,9 @@ function startPartySheet(item, pid, state = {}) {
 }
 
 function paywallSheet(state) {
-  const source = state.paywallSource || "provider";
-  const pid = state.paywallPid;
-  const name = pid && PROVIDERS[pid] ? PROVIDERS[pid].name : "premium services";
   const yearly = state.paywallPeriod !== "monthly";
-  const quota = source === "quota";
-  const title = quota ? "No free parties left this week 😢" : "Ready to get started?";
-  const lead = quota
-    ? `You can host 1 free watch party on ${name} every week. To host more parties every week, subscribe to Teleparty Premium.`
-    : "Get started with a free Teleparty Premium trial! Host unlimited watch parties on our channels & customize chat.";
+  const title = "Ready to get started?";
+  const lead = "Get started with a free Teleparty Premium trial! Host unlimited watch parties on our channels & customize chat.";
   const price = yearly ? "$59.99 / year" : "$19.99 / month";
   const save = yearly ? "Save 25%" : "";
   return `<div class="scrim" data-action="close-sheet"></div>
@@ -472,15 +383,6 @@ function switcherSheet(current, opts = {}) {
     </div>`;
 }
 
-function nowChip(pid, opts = {}) {
-  if (!pid || !PROVIDERS[pid] || !isLinked(pid, opts)) {
-    return `<button class="now-chip connect-chip" data-action="open-switcher" type="button"><span class="plus">+</span><span>Connect</span></button>`;
-  }
-  const p = PROVIDERS[pid];
-  return `<button class="now-chip" data-action="open-switcher" type="button">${pmark(pid)}<span>${p.name}</span><span class="now-chev" aria-hidden="true">▾</span></button>`;
-}
-
-/* Browse experiment: a fixed Teleparty mark, not the service switcher. */
 function telepartyTitleBar() {
   return `<div class="app-head workspace">
     <div class="ws-switch brand-lock">
@@ -501,58 +403,6 @@ function providerTitleBar(pid) {
     </div>
   </div>`;
 }
-function telepartyBrandSwitch() {
-  const ids = PROVIDER_ORDER;
-  const step = 1.2;
-  const chev = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
-  return `<button class="ws-switch brand-home" data-action="open-switcher" type="button" aria-label="Teleparty">
-    <span class="brand-lottie" aria-hidden="true">
-      ${ids.map((p, i) => `<span class="brand-frame" style="animation-delay:${(i * step).toFixed(1)}s">${pmark(p, "round")}</span>`).join("")}
-    </span>
-    <span class="ws-name">Teleparty</span>
-    <span class="ws-chev" aria-hidden="true">${chev}</span>
-  </button>`;
-}
-
-function workspaceSwitch(pid, opts = {}) {
-  const linked = opts.forceHeader || isLinked(pid, opts);
-  if (!pid || !PROVIDERS[pid] || !linked) {
-    return `<button class="ws-switch" data-action="open-switcher" type="button">
-      <span class="ws-logo plus">+</span>
-      <span class="ws-name">Connect</span>
-      <span class="ws-chev" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
-    </button>`;
-  }
-  const p = PROVIDERS[pid];
-  return `<button class="ws-switch" data-action="open-switcher" type="button">
-    ${pmark(pid, "round")}
-    <span class="ws-name">${p.name}</span>
-    <span class="ws-chev" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
-  </button>`;
-}
-
-function appHead(title, state = {}, opts = {}) {
-  const any = state.conn && Object.values(state.conn).some(Boolean);
-  const pid = any ? (state.provider || "youtube") : null;
-  if (title === "Home") {
-    if (state.brandHome) {
-      return `<div class="app-head workspace">${telepartyBrandSwitch()}</div>`;
-    }
-    const any = state.conn && Object.values(state.conn).some(Boolean);
-    const pid = state.forceHeader && state.provider
-      ? state.provider
-      : (any ? (state.provider || "youtube") : null);
-    const headOpts = state.forceHeader ? Object.assign({}, opts, { forceHeader: true }) : opts;
-    return `<div class="app-head workspace">
-      ${workspaceSwitch(pid, headOpts)}
-    </div>`;
-  }
-  return `<div class="app-head">
-    <h1>${title}</h1>
-    <div class="app-head-actions">${nowChip(pid, opts)}</div>
-  </div>`;
-}
-
 function huddlePeople(state, count) {
   return HUDDLE.slice(0, count).map((m) => {
     if (m.n !== "You") return m;
@@ -589,43 +439,6 @@ function wireCatalog(body, pid) {
     );
 }
 
-function tvAppTile(pid, current, opts = {}) {
-  const p = PROVIDERS[pid];
-  const connected = isLinked(pid, opts);
-  const active = pid === current && connected;
-  return `<button class="tv-app ${active ? "current" : ""}" data-action="pick-service" data-p="${pid}" type="button">
-    <span class="tv-tile" style="background:${p.color}">${p.mark}${connected ? `<span class="tv-tick">✓</span>` : ""}</span>
-    <span class="tv-nm">${p.name}</span>
-  </button>`;
-}
-
-function tvAppsGrid(current, opts = {}) {
-  const recents = PROVIDER_ORDER.filter((p) => isLinked(p, opts)).slice(0, 4);
-  const rest = PROVIDER_ORDER.filter((p) => !recents.includes(p));
-  const currentP = current && PROVIDERS[current] ? PROVIDERS[current] : null;
-  const hero = currentP ? `<div class="tv-hero">
-      <div class="tv-hero-mark" style="background:${currentP.color}">${currentP.mark}</div>
-      <div>
-        <h3>${currentP.name}</h3>
-        <p>${opts.playing ? "Playing in the party" : "Ready to browse"}</p>
-      </div>
-      <button class="btn ghost sm" data-action="open-browse" type="button">Open</button>
-    </div>` : "";
-  return `${hero}
-    ${recents.length ? `<div class="sec-head" style="padding:18px 0 10px"><span class="sec-title big">Recently used</span></div>
-      <div class="tv-grid">${recents.map((p) => tvAppTile(p, current, opts)).join("")}</div>` : ""}
-    <div class="sec-head" style="padding:18px 0 10px"><span class="sec-title big">All apps</span></div>
-    <div class="tv-grid">
-      ${rest.map((p) => tvAppTile(p, current, opts)).join("")}
-      <button class="tv-app add" data-action="open-switcher" type="button"><span class="tv-tile">+</span><span class="tv-nm">Add</span></button>
-    </div>`;
-}
-
-/* Header pill kept as an alias for older snapshots. */
-function servicePill(pid, opts = {}) {
-  return nowChip(pid, opts);
-}
-
 function premiumBlock() {
   return `<div class="premium-card">
     <div class="premium-card-top">
@@ -641,9 +454,7 @@ function premiumBlock() {
 
 /* Capsule dock: Profile · Home · Browse in the pill, Party as the orb on the right. */
 function nav(activeTab, _unused, opts = {}) {
-  const resolved = activeTab === "browse" ? "apps"
-    : (activeTab === "profile" || activeTab === "accounts" || activeTab === "settings" || activeTab === "you") ? "profile"
-    : activeTab;
+  const resolved = activeTab === "browse" ? "apps" : activeTab;
   const item = (id, label, badge) => `
     <button class="nav-item ${resolved === id ? "active" : ""}" data-action="nav" data-tab="${id}" type="button">
       <span class="ico-wrap">${ICONS[id]}${badge ? '<span class="ndot"></span>' : ""}</span>
@@ -667,37 +478,6 @@ function nav(activeTab, _unused, opts = {}) {
     </div>`;
 }
 
-function confirmSignOutSheet(pid) {
-  const p = PROVIDERS[pid];
-  return `<div class="scrim" data-action="close-sheet"></div>
-    <div class="sheet">
-      <div class="sheet-grab"></div>
-      <div class="row gap12" style="align-items:flex-start;margin-bottom:8px">
-        ${pmark(pid, "lg")}
-        <div class="grow">
-          <div class="sheet-t">Remove ${p.name}?</div>
-          <p class="svc-lead" style="margin-top:6px">You'll need to sign in again to browse or host on ${p.name}. Your Teleparty account stays signed in.</p>
-        </div>
-      </div>
-      <div class="sheet-actions">
-        <button class="btn danger block" data-action="confirm-signout" data-p="${pid}" type="button">Sign out</button>
-        <button class="btn ghost block" data-action="close-sheet" type="button">Cancel</button>
-      </div>
-    </div>`;
-}
-
-/* overlay renders above the scrolling screen — used for sheets, scrims and docks. */
 function phone(inner, navHtml, overlay = "") {
   return `<div class="phone">${statusBar()}<div class="screen">${inner}</div>${overlay}${navHtml}</div>`;
-}
-
-function frame(title, desc, inner, navHtml, overlay = "") {
-  return `<div class="frame-wrap">
-    ${phone(inner, navHtml, overlay)}
-    <div class="frame-caption"><h3>${title}</h3><p>${desc}</p></div>
-  </div>`;
-}
-
-function mount(id, html) {
-  document.getElementById(id).innerHTML = html;
 }
