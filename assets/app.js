@@ -279,6 +279,7 @@ function webviewPage(pid, mode = {}) {
       ${row("Trending now", items)}
       ${row("Because you watched", items.slice().reverse())}
       ${row("New releases", items)}
+      ${mode.long ? row("Continue watching", items) + row("Top picks", items.slice().reverse()) : ""}
       <div class="spacer-nav"></div>
     </div>`;
 }
@@ -429,6 +430,7 @@ function hasLoginAccount(conn = {}, opts = {}) {
 /* Service picker: a wrapping grid (more columns as the sheet gets wider) plus Free / Premium filters. */
 function switcherSheet(current, opts = {}) {
   const filter = opts.filter || "all";
+  const layout = opts.layout === "list" ? "list" : "grid";
   const ids = PROVIDER_ORDER.filter((pid) => {
     const tier = PROVIDERS[pid].tier;
     if (filter === "free") return tier !== "premium";
@@ -436,6 +438,9 @@ function switcherSheet(current, opts = {}) {
     return true;
   });
   const chip = (id, label) => `<button class="picker-chip" data-action="switcher-filter" data-filter="${id}" aria-selected="${filter === id}" type="button">${label}</button>`;
+  const viewBtn = (id, label, icon) => `<button class="picker-view-btn" data-action="switcher-layout" data-layout="${id}" type="button" aria-label="${label}" aria-pressed="${layout === id}">${icon}</button>`;
+  const gridIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>`;
+  const listIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"/></svg>`;
   const tiles = ids.map((pid) => {
     const p = PROVIDERS[pid];
     const on = pid === current;
@@ -457,8 +462,13 @@ function switcherSheet(current, opts = {}) {
         ${chip("all", "All")}
         ${chip("free", "Free")}
         ${chip("premium", "Premium")}
+        <div class="picker-view" role="group" aria-label="Layout">
+          ${viewBtn("grid", "Grid", gridIcon)}
+          <span class="picker-view-div" aria-hidden="true"></span>
+          ${viewBtn("list", "List", listIcon)}
+        </div>
       </div>
-      ${tiles ? `<div class="picker-grid">${tiles}</div>` : `<p class="picker-empty">No services in this filter.</p>`}
+      ${tiles ? `<div class="picker-grid${layout === "list" ? " is-list" : ""}">${tiles}</div>` : `<p class="picker-empty">No services in this filter.</p>`}
     </div>`;
 }
 
@@ -470,7 +480,27 @@ function nowChip(pid, opts = {}) {
   return `<button class="now-chip" data-action="open-switcher" type="button">${pmark(pid)}<span>${p.name}</span><span class="now-chev" aria-hidden="true">▾</span></button>`;
 }
 
-/* New-user v1 header: the word Teleparty, with a looping mark that crossfades every provider. */
+/* Browse experiment: a fixed Teleparty mark, not the service switcher. */
+function telepartyTitleBar() {
+  return `<div class="app-head workspace">
+    <div class="ws-switch brand-lock">
+      <span class="tp-logo" aria-hidden="true">Tp</span>
+      <span class="ws-name">Teleparty</span>
+    </div>
+  </div>`;
+}
+
+function providerTitleBar(pid) {
+  const p = PROVIDERS[pid];
+  const chev = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+  return `<div class="app-head workspace">
+    <div class="ws-switch brand-lock" aria-label="${p.name}">
+      ${pmark(pid, "round")}
+      <span class="ws-name">${p.name}</span>
+      <span class="ws-chev" aria-hidden="true">${chev}</span>
+    </div>
+  </div>`;
+}
 function telepartyBrandSwitch() {
   const ids = PROVIDER_ORDER;
   const step = 1.2;

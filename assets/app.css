@@ -122,6 +122,46 @@ a { color: inherit; }
 .app-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; flex: 1; min-width: 0; }
 .app-head-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 
+.announce {
+  position: relative; z-index: 10;
+  display: flex; align-items: center;
+  margin: 14px 20px 0; height: 40px; padding: 0 14px;
+  border-radius: 12px;
+  background: #1a1a1d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.announce-track {
+  flex: 1; min-width: 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 16px), transparent);
+}
+.announce-marquee {
+  display: flex; width: max-content;
+  animation: announceScroll 16s linear infinite;
+}
+.announce-item {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding-right: 48px;
+  font-size: 13px; font-weight: 500; color: #fff; white-space: nowrap;
+}
+.announce-item .pmark { width: 16px; height: 16px; font-size: 8px; border-radius: 4px; }
+@keyframes announceScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .announce-marquee { animation: none; }
+}
+.phone.device-expanded .announce { margin-left: 24px; margin-right: 24px; }
+
+.ws-switch.brand-lock { cursor: default; }
+.tp-logo {
+  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  display: grid; place-items: center;
+  background: var(--grad-cta); color: #fff;
+  font-size: 14px; font-weight: 800; letter-spacing: -0.04em;
+}
 .ws-switch {
   display: inline-flex; align-items: center; gap: 10px;
   min-width: 0; flex: 1; max-width: 100%;
@@ -787,8 +827,19 @@ a { color: inherit; }
   text-transform: uppercase; color: rgba(255,255,255,.42);
 }
 .picker-filters {
-  display: flex; gap: 8px; margin: 14px 0 16px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px; margin: 14px 0 16px; flex-wrap: wrap;
 }
+.picker-view {
+  margin-left: auto; display: flex; align-items: center; gap: 2px; height: 32px; flex: none;
+}
+.picker-view-btn {
+  width: 32px; height: 32px; border: 0; border-radius: 8px; padding: 0;
+  background: transparent; color: rgba(255,255,255,.38);
+  display: grid; place-items: center; cursor: pointer;
+}
+.picker-view-btn svg { width: 18px; height: 18px; display: block; }
+.picker-view-btn[aria-pressed="true"] { color: #fff; }
+.picker-view-div { width: 1px; height: 16px; background: rgba(255,255,255,.18); }
 .picker-chip {
   height: 32px; padding: 0 14px; border-radius: 999px;
   border: 1px solid rgba(255,255,255,.16);
@@ -823,6 +874,20 @@ a { color: inherit; }
 .picker-name {
   font-size: 13px; font-weight: 650; text-align: center; line-height: 1.15;
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.picker-grid.is-list {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.picker-grid.is-list .picker-tile {
+  aspect-ratio: auto; flex-direction: row; justify-content: flex-start;
+  height: 64px; border-radius: 16px; padding: 0 16px; gap: 12px;
+}
+.picker-grid.is-list .picker-logo .pmark.round {
+  width: 36px; height: 36px; font-size: 12px;
+}
+.picker-grid.is-list .picker-name { text-align: left; font-size: 15px; }
+.picker-grid.is-list .picker-star {
+  position: static; order: 1; margin-left: auto;
 }
 .picker-star {
   position: absolute; top: 8px; right: 8px;
@@ -1121,6 +1186,33 @@ a { color: inherit; }
 }
 
 .apps-catalog { position: relative; z-index: 10; padding-top: 28px; }
+.screen:has(.chrome-bar) {
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.chrome-bar {
+  position: relative; z-index: 10;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+}
+.chrome-bar-slot {
+  flex: none; max-height: 120px; overflow: hidden;
+  transition: max-height .28s ease;
+}
+.chrome-bar.is-bar-hidden .chrome-bar-slot { max-height: 36px; }
+.chrome-bar-slot .app-head { transition: opacity .2s ease; }
+.chrome-bar.is-bar-hidden .chrome-bar-slot .app-head {
+  opacity: 0; pointer-events: none;
+}
+.chrome-scroll {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none;
+}
+.chrome-scroll::-webkit-scrollbar { display: none; }
+.chrome-scroll .apps-catalog { padding-top: 0; }
+.chrome-scroll .apps-catalog.connect-only {
+  position: relative; inset: auto; min-height: 100%;
+}
+.chrome-scroll .ps-top { padding-top: 4px; }
 .apps-catalog.connect-only {
   position: absolute; inset: 0; z-index: 10;
   display: flex; align-items: center; justify-content: center;
@@ -2026,6 +2118,7 @@ button.acc-card {
 .phone.device-expanded .apps-catalog {
   padding-top: 20px;
 }
+.phone.device-expanded .chrome-scroll .apps-catalog { padding-top: 0; }
 .phone.device-expanded .app-head {
   padding: 36px 24px 8px;
   gap: 12px;

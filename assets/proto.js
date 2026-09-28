@@ -186,21 +186,38 @@ function protoTrending(state) {
   </div>`;
 }
 
+function protoAnnounce(state) {
+  const a = state.announcement;
+  if (!a || !a.text) return "";
+  const mark = a.provider && PROVIDERS[a.provider] ? pmark(a.provider, "sm") : "";
+  const item = `<span class="announce-item">${mark}<span>${a.text}</span></span>`;
+  return `<div class="announce" role="status" aria-label="${a.text}">
+    <div class="announce-track" aria-hidden="true"><div class="announce-marquee">${item}${item}</div></div>
+  </div>`;
+}
+
+function withChrome(body, bar) {
+  return `<div class="chrome-bar">
+    <div class="chrome-bar-slot">${bar}</div>
+    <div class="chrome-scroll">${body}</div>
+  </div>`;
+}
+
 function protoHome(state) {
   const opts = linkOpts(state);
-  const head = `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-    ${appHead("Home", state, opts)}`;
   const showPremium = !state.isPremium && (state.previewCatalog || hasLoginAccount(state.conn, opts));
   const catalog = protoJumpBackIn(state)
     + protoTrending(state)
     + (showPremium ? premiumBlock() : "");
-
-  return head
-    + `<div class="home-body">
+  const body = `${protoAnnounce(state)}
+    <div class="home-body">
         <div class="home-col party-col">${protoPartyCard(state)}</div>
         <div class="home-col catalog-col">${catalog}</div>
-      </div>`
-    + `<div class="spacer-nav"></div>`;
+      </div>
+    <div class="spacer-nav"></div>`;
+
+  return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
+    ${withChrome(body, telepartyTitleBar())}`;
 }
 
 function partyMembers(state) {
@@ -264,9 +281,9 @@ function protoApps(state) {
     return `<div class="apps-catalog connect-only">${protoConnectCard()}</div>`;
   }
   const pid = state.provider || PROVIDER_ORDER.find((p) => isLinked(p, opts)) || "youtube";
-  const body = isLinked(pid, opts) ? webviewPage(pid) : webviewLogin(pid);
+  const body = isLinked(pid, opts) ? webviewPage(pid, { long: true }) : webviewLogin(pid);
   return `<div class="ambient ${state.isPremium ? "premium" : ""}"></div>
-    <div class="apps-catalog">${wireCatalog(body, pid)}</div>`;
+    ${withChrome(`<div class="apps-catalog">${wireCatalog(body, pid)}</div>`, providerTitleBar(pid))}`;
 }
 
 function protoInbox(state) {
@@ -628,7 +645,10 @@ function protoOverlay(state) {
     quota: state.quota,
   };
   if (state.sheet === "switcher") {
-    return switcherSheet(state.provider, Object.assign({}, opts, { filter: state.switcherFilter || "all" }));
+    return switcherSheet(state.provider, Object.assign({}, opts, {
+      filter: state.switcherFilter || "all",
+      layout: state.switcherLayout || "grid",
+    }));
   }
   if (state.sheet === "title" && state.focusItem) {
     return startPartySheet(state.focusItem, state.focusProvider, state);
@@ -819,8 +839,7 @@ const PAGE_SCENES = {
     { id: "home-none", label: "No party yet", group: "Home" },
     { id: "left", label: "Left · rejoin", group: "Home" },
     { id: "empty", label: "New user", group: "Home" },
-    { id: "empty-v1", label: "New user v1", group: "Home" },
-    { id: "profile-tab", label: "Profile", group: "Home", tabOnly: "profile" },
+    { id: "announce", label: "Announcement", group: "Home" },
     { id: "apps", label: "Browse", group: "Browse" },
     { id: "netflix-reauth", label: "Netflix re-auth", group: "Browse" },
     { id: "switcher", label: "Switch service", group: "Sheets" },
@@ -889,8 +908,10 @@ function freshState() {
     brandHome: false,
     previewCatalog: false,
     switcherFilter: "all",
+    switcherLayout: "grid",
     forceHeader: false,
     hideContinue: false,
+    announcement: null,
     _scenario: "full",
     device: "compact",
   };
@@ -917,8 +938,10 @@ function applyScenario(state, name) {
   state.brandHome = false;
   state.previewCatalog = false;
   state.switcherFilter = "all";
+  state.switcherLayout = "grid";
   state.forceHeader = false;
   state.hideContinue = false;
+  state.announcement = null;
 
   const withAccounts = () => {
     state.conn = defaultConn("full");
@@ -929,28 +952,15 @@ function applyScenario(state, name) {
     state.hasHistory = true;
   };
 
-  if (name === "empty" || name === "empty-connect") {
-    state.youtubeLogin = true;
-    state.conn = defaultConn("empty", { youtubeLogin: true });
-    state.provider = "crunchyroll";
-    state.forceHeader = true;
-    state.hideContinue = true;
-    state.filter = "all";
-    state.party = "none";
-    state.hasHistory = false;
-    state.previewCatalog = true;
-    state.brandHome = false;
-    state.tab = "home";
-    return;
-  }
-  if (name === "empty-v1") {
+  if (name === "empty" || name === "empty-connect" || name === "empty-v1") {
     state.youtubeLogin = true;
     state.conn = defaultConn("empty", { youtubeLogin: true });
     state.provider = null;
+    state.forceHeader = false;
+    state.hideContinue = true;
     state.filter = "all";
     state.party = "none";
     state.hasHistory = false;
-    state.hideContinue = true;
     state.previewCatalog = true;
     state.brandHome = true;
     state.tab = "home";
@@ -960,6 +970,16 @@ function applyScenario(state, name) {
     withAccounts();
     state.party = "left";
     state.tab = "home";
+    return;
+  }
+  if (name === "announce") {
+    withAccounts();
+    state.party = "playing";
+    state.tab = "home";
+    state.announcement = {
+      provider: "netflix",
+      text: "Hey, Netflix is having trouble. We're working on it.",
+    };
     return;
   }
   if (name === "home-none") {
@@ -1432,7 +1452,22 @@ function mountInteractive(root, options = {}) {
       c.classList.toggle("on", c.dataset.device === (state.device || "compact"));
     });
     restoreTrendingTabs();
+    bindChromeBar();
     requestAnimationFrame(() => requestAnimationFrame(fitFsPhone));
+  }
+
+  function bindChromeBar() {
+    const root = wrap.querySelector(".chrome-bar");
+    const scroller = root && root.querySelector(".chrome-scroll");
+    if (!root || !scroller) return;
+    let last = scroller.scrollTop;
+    scroller.addEventListener("scroll", () => {
+      const y = scroller.scrollTop;
+      if (y <= 8) root.classList.remove("is-bar-hidden");
+      else if (y > 32 && y > last + 8) root.classList.add("is-bar-hidden");
+      else if (y < last - 8) root.classList.remove("is-bar-hidden");
+      last = y;
+    }, { passive: true });
   }
 
   function setScenario(name) {
@@ -1571,6 +1606,12 @@ function mountInteractive(root, options = {}) {
     }
     if (action === "switcher-filter") {
       state.switcherFilter = t.dataset.filter || "all";
+      state.sheet = "switcher";
+      render();
+      return;
+    }
+    if (action === "switcher-layout") {
+      state.switcherLayout = t.dataset.layout === "list" ? "list" : "grid";
       state.sheet = "switcher";
       render();
       return;
